@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run dev:*)",
+      "Bash(npm install:*)",
+      "Bash(sudo rm:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm start)",
+      "Bash(grep:*)",
+      "Bash(mv:*)",
+      "Bash(rm:*)",
+      "mcp__ide__executeCode",
+      "Bash(pkill:*)",
+      "Bash(node:*)",
+      "Bash(curl:*)",
+      "Bash(lsof:*)",
+      "Bash(rg:*)",
+      "Bash(sed:*)",
+      "Bash(npm run test:*)",
+      "Bash(npm run lint)",
+      "Bash(npm run typecheck:*)",
+      "Bash(npx tsc:*)",
+      "Bash(touch:*)",
+      "Bash(ls:*)",
+      "Bash(npx vite build:*)"
+    ],
+    "deny": []
+  }
+}
