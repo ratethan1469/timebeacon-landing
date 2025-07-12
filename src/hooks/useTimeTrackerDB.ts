@@ -6,6 +6,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { TimeEntry, Project, Client, UserSettings } from '../types';
 import { timeBeaconDB } from '../services/database';
+import { mockTimeEntries, mockProjects, mockClients } from '../mockData';
 
 interface TimeTrackerState {
   timeEntries: TimeEntry[];
@@ -108,76 +109,26 @@ export const useTimeTrackerDB = () => {
     initializeData();
   }, []);
 
-  // Create initial seed data for new users
+  // Create initial seed data for new users using rich mock data
   const createInitialData = async () => {
-    // Create default clients
-    const clients: Client[] = [
-      {
-        id: 'client-1',
-        name: 'Acme Corp',
-        color: '#3b82f6',
-        active: true,
-        contactEmail: 'contact@acme.com',
-        createdAt: new Date().toISOString()
-      },
-      {
-        id: 'client-2',
-        name: 'TechStart Inc',
-        color: '#10b981',
-        active: true,
-        contactEmail: 'hello@techstart.com',
-        createdAt: new Date().toISOString()
-      }
-    ];
-
-    // Create default projects
-    const projects: Project[] = [
-      {
-        id: 'project-1',
-        name: 'Website Redesign',
-        client: 'Acme Corp',
-        color: '#3b82f6',
-        rate: 125,
-        budget: 50000,
-        active: true,
-        billable: true,
-        createdAt: new Date().toISOString()
-      },
-      {
-        id: 'project-2',
-        name: 'Mobile App Development',
-        client: 'TechStart Inc',
-        color: '#10b981',
-        rate: 150,
-        budget: 75000,
-        active: true,
-        billable: true,
-        createdAt: new Date().toISOString()
-      },
-      {
-        id: 'project-3',
-        name: 'Internal Tools',
-        client: 'Internal',
-        color: '#f59e0b',
-        rate: 0,
-        active: true,
-        billable: false,
-        createdAt: new Date().toISOString()
-      }
-    ];
-
-    // Save to database
-    for (const client of clients) {
+    console.log('🚀 Creating initial data with mock entries...');
+    
+    // Use comprehensive mock data instead of minimal seed data
+    for (const client of mockClients) {
       await timeBeaconDB.addClient(client);
     }
     
-    for (const project of projects) {
+    for (const project of mockProjects) {
       await timeBeaconDB.addProject(project);
+    }
+
+    for (const entry of mockTimeEntries) {
+      await timeBeaconDB.addTimeEntry(entry);
     }
 
     await timeBeaconDB.updateSettings(defaultSettings);
     
-    console.log('✅ Initial data created');
+    console.log('✅ Initial data created with', mockTimeEntries.length, 'time entries,', mockProjects.length, 'projects, and', mockClients.length, 'clients');
   };
 
   // Time Entry Operations

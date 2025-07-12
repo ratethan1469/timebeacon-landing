@@ -369,6 +369,37 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
             Next Week →
           </button>
         </div>
+        
+        <div className="add-entry-section">
+          <button 
+            className="btn btn-primary add-entry-btn"
+            onClick={() => {
+              // Create a new time entry for today
+              if (onAddEntry) {
+                const today = new Date().toISOString().split('T')[0];
+                const now = new Date();
+                const startTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+                const endTime = `${(now.getHours() + 1).toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+                
+                onAddEntry({
+                  date: today,
+                  startTime,
+                  endTime,
+                  duration: 1,
+                  client: projects[0]?.client || 'New Client',
+                  project: projects[0]?.name || 'New Project',
+                  description: 'New time entry',
+                  category: 'client',
+                  status: 'pending',
+                  automated: false,
+                  billable: true
+                });
+              }
+            }}
+          >
+            ➕ Add Entry
+          </button>
+        </div>
       </div>
 
       <div className="week-summary">
@@ -388,11 +419,20 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
             {getTotalHoursForWeek() > 0 ? ((entries.filter(e => weekDates.includes(e.date) && e.billable).reduce((sum, e) => sum + e.duration, 0) / getTotalHoursForWeek()) * 100).toFixed(1) : 0}%
           </div>
         </div>
-        <div className="summary-card">
-          <div className="summary-label">Pending Entries</div>
-          <div className="summary-value">
-            {entries.filter(e => weekDates.includes(e.date) && e.status === 'pending').length}
-          </div>
+        <div className="summary-card submit-entries-card">
+          <button 
+            className="btn btn-primary submit-entries-btn"
+            onClick={() => {
+              // Submit all pending entries for approval
+              const pendingEntries = entries.filter(e => weekDates.includes(e.date) && e.status === 'pending');
+              pendingEntries.forEach(entry => {
+                onUpdateEntry(entry.id, { status: 'submitted' });
+              });
+            }}
+            disabled={getPendingEntriesCount() === 0}
+          >
+            📝 Submit Entries ({getPendingEntriesCount()})
+          </button>
         </div>
         <div className="summary-card">
           <div className="summary-label">Automated Entries</div>
