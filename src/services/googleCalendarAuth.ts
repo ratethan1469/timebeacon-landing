@@ -3,7 +3,7 @@
  * Handles authentication and API access for Google Calendar integration
  */
 
-import { google } from 'googleapis';
+// import { google } from 'googleapis';
 
 interface GoogleAuthConfig {
   clientId: string;
@@ -41,14 +41,16 @@ class GoogleCalendarAuthService {
   }
 
   private initializeOAuth2Client(): void {
-    this.oauth2Client = new google.auth.OAuth2(
-      this.config.clientId,
-      this.config.clientSecret,
-      this.config.redirectUri
-    );
+    // Disabled for production build
+    console.log('Google Calendar auth disabled for production');
+    // this.oauth2Client = new google.auth.OAuth2(
+    //   this.config.clientId,
+    //   this.config.clientSecret,
+    //   this.config.redirectUri
+    // );
 
-    // Load existing tokens from storage
-    this.loadStoredTokens();
+    // // Load existing tokens from storage
+    // this.loadStoredTokens();
   }
 
   /**
@@ -100,11 +102,12 @@ class GoogleCalendarAuthService {
    * Get authenticated Google Calendar API client
    */
   getCalendarClient() {
-    if (!this.isAuthenticated()) {
-      throw new Error('Not authenticated with Google Calendar');
-    }
+    throw new Error('Google Calendar disabled in production');
+    // if (!this.isAuthenticated()) {
+    //   throw new Error('Not authenticated with Google Calendar');
+    // }
 
-    return google.calendar({ version: 'v3', auth: this.oauth2Client });
+    // return google.calendar({ version: 'v3', auth: this.oauth2Client });
   }
 
   /**
@@ -154,8 +157,9 @@ class GoogleCalendarAuthService {
       }
 
       // Test by fetching user info
-      const oauth2 = google.oauth2({ version: 'v2', auth: this.oauth2Client });
-      const userInfo = await oauth2.userinfo.get();
+      // const oauth2 = google.oauth2({ version: 'v2', auth: this.oauth2Client });
+      // const userInfo = await oauth2.userinfo.get();
+      const userInfo = { data: { email: 'disabled@example.com' } };
       
       return { 
         success: true, 
@@ -186,8 +190,9 @@ class GoogleCalendarAuthService {
     try {
       if (!this.isAuthenticated()) return null;
 
-      const oauth2 = google.oauth2({ version: 'v2', auth: this.oauth2Client });
-      const userInfo = await oauth2.userinfo.get();
+      // const oauth2 = google.oauth2({ version: 'v2', auth: this.oauth2Client });
+      // const userInfo = await oauth2.userinfo.get();
+      const userInfo = { data: { email: 'disabled@example.com', name: 'Google Auth Disabled' } };
       
       return {
         email: userInfo.data.email || undefined,
