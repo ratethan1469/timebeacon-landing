@@ -41,6 +41,11 @@
   "dependencies": {
     "@google-cloud/local-auth": "^3.0.1",
     "express": "^4.18.2",
-    "googleapis": "^150.0.1"
+    "googleapis": "^150.0.1",
+    "vite": "^7.0.0",
+    "@vitejs/plugin-react": "^4.6.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "typescript": "^5.8.3"
   }
 }
