@@ -66,8 +66,11 @@ export const useTimeTrackerDB = () => {
           timeBeaconDB.getSettings()
         ]);
 
-        // If no data exists, create initial seed data
-        if (projects.length === 0 && clients.length === 0) {
+        // If no time entries exist, load comprehensive mock data
+        if (timeEntries.length === 0) {
+          console.log('🔄 No time entries found. Loading mock data...');
+          // Clear any existing minimal data and load comprehensive mock data
+          await timeBeaconDB.clearAllData();
           await createInitialData();
           // Re-fetch after seeding
           const [newTimeEntries, newProjects, newClients] = await Promise.all([
