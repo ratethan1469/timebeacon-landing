@@ -12,43 +12,50 @@ const integrationDetails = {
     name: 'Google Calendar',
     description: 'Automatically create time entries from calendar meetings',
     icon: '📅',
-    color: '#4285F4'
+    color: '#4285F4',
+    category: 'Calendar & Scheduling'
   },
   'slack': {
     name: 'Slack',
     description: 'Track time spent in client channels and DMs',
     icon: '💬',
-    color: '#4A154B'
+    color: '#4A154B',
+    category: 'Communication'
   },
   'zoom': {
     name: 'Zoom',
     description: 'Auto-track meeting duration and participants',
     icon: '📹',
-    color: '#2D8CFF'
+    color: '#2D8CFF',
+    category: 'Video Conferencing'
   },
   'teams': {
     name: 'Microsoft Teams',
     description: 'Track meetings and collaboration time',
     icon: '👥',
-    color: '#6264A7'
+    color: '#6264A7',
+    category: 'Video Conferencing'
   },
   'gmail': {
     name: 'Gmail',
     description: 'Track time spent on client email threads',
     icon: '📧',
-    color: '#EA4335'
+    color: '#EA4335',
+    category: 'Communication'
   },
   'jira': {
     name: 'Jira',
     description: 'Auto-create entries from ticket work',
     icon: '🎯',
-    color: '#0052CC'
+    color: '#0052CC',
+    category: 'Project Management'
   },
   'salesforce': {
     name: 'Salesforce',
     description: 'Track customer interactions and opportunities',
     icon: '☁️',
-    color: '#00A1E0'
+    color: '#00A1E0',
+    category: 'CRM & Sales'
   }
 };
 

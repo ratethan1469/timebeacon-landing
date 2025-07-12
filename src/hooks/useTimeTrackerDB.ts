@@ -6,7 +6,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { TimeEntry, Project, Client, UserSettings } from '../types';
 import { timeBeaconDB } from '../services/database';
-import { mockTimeEntries, mockProjects, mockClients } from '../mockData';
+import { mockTimeEntries, mockProjects, mockClients, mockSettings } from '../mockData';
 
 interface TimeTrackerState {
   timeEntries: TimeEntry[];
@@ -129,7 +129,38 @@ export const useTimeTrackerDB = () => {
       await timeBeaconDB.addTimeEntry(entry);
     }
 
-    await timeBeaconDB.updateSettings(defaultSettings);
+    // Convert mockSettings to UserSettings format
+    const convertedSettings: UserSettings = {
+      theme: mockSettings.theme,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      workingHours: {
+        start: mockSettings.workingHours.start,
+        end: mockSettings.workingHours.end,
+        workingDays: [1, 2, 3, 4, 5]
+      },
+      notifications: {
+        enableDesktop: mockSettings.notifications,
+        reminderInterval: 60,
+        endOfDayReminder: true
+      },
+      privacy: {
+        trackActiveWindow: false,
+        trackKeystrokes: false,
+        trackMouse: false,
+        blurScreenshots: true
+      },
+      integrations: mockSettings.integrations.reduce((acc, integration) => {
+        acc[integration.name] = {
+          enabled: integration.enabled,
+          lastSync: integration.lastSync,
+          connectedAt: integration.connectedAt,
+          settings: integration.settings
+        };
+        return acc;
+      }, {} as any)
+    };
+    
+    await timeBeaconDB.updateSettings(convertedSettings);
     
     console.log('✅ Initial data created with', mockTimeEntries.length, 'time entries,', mockProjects.length, 'projects, and', mockClients.length, 'clients');
   };
