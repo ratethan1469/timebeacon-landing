@@ -23,7 +23,9 @@
       "Bash(touch:*)",
       "Bash(ls:*)",
       "Bash(npx vite build:*)",
-      "Bash(kill:*)"
+      "Bash(kill:*)",
+      "Bash(git tag:*)",
+      "Bash(git push:*)"
     ],
     "deny": []
   }

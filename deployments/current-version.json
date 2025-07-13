@@ -1,15 +1,16 @@
 {
-  "version": "2.1.0",
-  "name": "Dashboard Restructure",
-  "deployedAt": "2025-01-13T22:00:00Z",
+  "version": "2.2.0",
+  "name": "Enhanced Dashboard with Current Week Data & Proper Add Entry",
+  "deployedAt": "2025-07-13T22:30:00Z",
   "commit": "auto-generated",
   "features": [
-    "Dashboard as main time tracking interface",
-    "Simplified navigation structure",
-    "Enhanced time tracking with mock data",
-    "Week navigation and bulk actions",
-    "TypeScript error fixes"
+    "Fixed mock data to show current week (July 13, 2025)",
+    "Updated week format to Sunday-Saturday",
+    "Redesigned navigation layout: Previous/Date/Next on same line",
+    "Add Entry button below navigation with Current Week button",
+    "Proper Add Entry popup modal with form validation",
+    "Fixed random Salesforce entry issue"
   ],
   "rollbackCommand": "git revert HEAD && git push origin main",
-  "previousVersion": "2.0.0"
+  "previousVersion": "2.1.0"
 }

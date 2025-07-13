@@ -59,6 +59,16 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const [editingEntry, setEditingEntry] = useState<TimeEntry | null>(null);
   const [showDurationModal, setShowDurationModal] = useState(false);
   const [newDuration, setNewDuration] = useState(0);
+  const [showAddEntryModal, setShowAddEntryModal] = useState(false);
+  const [addEntryForm, setAddEntryForm] = useState({
+    date: new Date().toISOString().split('T')[0],
+    startTime: '09:00',
+    duration: 1,
+    client: '',
+    project: '',
+    description: '',
+    billable: true
+  });
   
   // Calendar events integration
   const { getEventsForDate } = useCalendarEvents();
@@ -204,6 +214,39 @@ export const Dashboard: React.FC<DashboardProps> = ({
     setNewDuration(Math.round(adjusted * 4) / 4); // Round to nearest 15-minute increment
   };
 
+  const handleAddEntrySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!onAddEntry) return;
+
+    const endTime = calculateEndTime(addEntryForm.startTime, addEntryForm.duration);
+    
+    onAddEntry({
+      date: addEntryForm.date,
+      startTime: addEntryForm.startTime,
+      endTime,
+      duration: addEntryForm.duration,
+      client: addEntryForm.client,
+      project: addEntryForm.project,
+      description: addEntryForm.description,
+      category: 'client',
+      status: 'pending',
+      automated: false,
+      billable: addEntryForm.billable
+    });
+
+    // Reset form and close modal
+    setAddEntryForm({
+      date: new Date().toISOString().split('T')[0],
+      startTime: '09:00',
+      duration: 1,
+      client: '',
+      project: '',
+      description: '',
+      billable: true
+    });
+    setShowAddEntryModal(false);
+  };
+
   const convertCalendarEventToTimeEntry = (event: CalendarEvent) => {
     if (!onAddEntry) {
       console.warn('onAddEntry prop not provided, cannot convert calendar event');
@@ -346,22 +389,18 @@ export const Dashboard: React.FC<DashboardProps> = ({
             Your weekly time tracking overview with smart automation
           </p>
         </div>
-        <div className="week-navigation">
+        
+        {/* Week Navigation - All on same line */}
+        <div className="week-navigation" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
           <button 
             className="btn btn-secondary"
             onClick={() => navigateWeek('prev')}
           >
             ← Previous Week
           </button>
-          {!isCurrentWeek() && (
-            <button 
-              className="btn btn-primary"
-              onClick={goToCurrentWeek}
-            >
-              📅 Current Week
-            </button>
-          )}
-          <span className="week-range">{weekRange}</span>
+          <span className="week-range" style={{ fontWeight: '600', fontSize: '16px', minWidth: '200px', textAlign: 'center' }}>
+            {weekRange}
+          </span>
           <button 
             className="btn btn-secondary"
             onClick={() => navigateWeek('next')}
@@ -370,35 +409,22 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </button>
         </div>
         
-        <div className="add-entry-section">
+        {/* Add Entry and Current Week buttons - Below navigation */}
+        <div className="action-buttons" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px' }}>
           <button 
-            className="btn btn-primary add-entry-btn"
-            onClick={() => {
-              // Create a new time entry for today
-              if (onAddEntry) {
-                const today = new Date().toISOString().split('T')[0];
-                const now = new Date();
-                const startTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-                const endTime = `${(now.getHours() + 1).toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-                
-                onAddEntry({
-                  date: today,
-                  startTime,
-                  endTime,
-                  duration: 1,
-                  client: projects[0]?.client || 'New Client',
-                  project: projects[0]?.name || 'New Project',
-                  description: 'New time entry',
-                  category: 'client',
-                  status: 'pending',
-                  automated: false,
-                  billable: true
-                });
-              }
-            }}
+            className="btn btn-primary"
+            onClick={() => setShowAddEntryModal(true)}
           >
             ➕ Add Entry
           </button>
+          {!isCurrentWeek() && (
+            <button 
+              className="btn btn-secondary"
+              onClick={goToCurrentWeek}
+            >
+              📅 Current Week
+            </button>
+          )}
         </div>
       </div>
 
@@ -761,6 +787,133 @@ export const Dashboard: React.FC<DashboardProps> = ({
               >
                 Save Duration
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Entry Modal */}
+      {showAddEntryModal && (
+        <div className="modal-overlay" onClick={() => setShowAddEntryModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>➕ Add New Time Entry</h3>
+              <button 
+                className="modal-close"
+                onClick={() => setShowAddEntryModal(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              <form onSubmit={handleAddEntrySubmit} className="entry-form">
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Date</label>
+                    <input
+                      type="date"
+                      value={addEntryForm.date}
+                      onChange={(e) => setAddEntryForm({ ...addEntryForm, date: e.target.value })}
+                      className="form-input"
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Start Time</label>
+                    <input
+                      type="time"
+                      value={addEntryForm.startTime}
+                      onChange={(e) => setAddEntryForm({ ...addEntryForm, startTime: e.target.value })}
+                      className="form-input"
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Duration (hours)</label>
+                    <input
+                      type="number"
+                      min="0.25"
+                      max="24"
+                      step="0.25"
+                      value={addEntryForm.duration}
+                      onChange={(e) => setAddEntryForm({ ...addEntryForm, duration: parseFloat(e.target.value) || 1 })}
+                      className="form-input"
+                      required
+                    />
+                  </div>
+                </div>
+                
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Client</label>
+                    <select
+                      value={addEntryForm.client}
+                      onChange={(e) => setAddEntryForm({ ...addEntryForm, client: e.target.value })}
+                      className="form-input"
+                      required
+                    >
+                      <option value="">Select Client</option>
+                      {clients.map(client => (
+                        <option key={client.id} value={client.name}>
+                          {client.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Project</label>
+                    <select
+                      value={addEntryForm.project}
+                      onChange={(e) => setAddEntryForm({ ...addEntryForm, project: e.target.value })}
+                      className="form-input"
+                      required
+                    >
+                      <option value="">Select Project</option>
+                      {projects.filter(p => p.active && (!addEntryForm.client || p.client === addEntryForm.client)).map(project => (
+                        <option key={project.id} value={project.name}>
+                          {project.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                
+                <div className="form-group">
+                  <label>Description</label>
+                  <textarea
+                    value={addEntryForm.description}
+                    onChange={(e) => setAddEntryForm({ ...addEntryForm, description: e.target.value })}
+                    className="form-input"
+                    rows={3}
+                    placeholder="What did you work on?"
+                    required
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <input
+                      type="checkbox"
+                      checked={addEntryForm.billable}
+                      onChange={(e) => setAddEntryForm({ ...addEntryForm, billable: e.target.checked })}
+                    />
+                    Billable
+                  </label>
+                </div>
+                
+                <div className="form-actions">
+                  <button type="submit" className="btn btn-primary">
+                    Add Entry
+                  </button>
+                  <button 
+                    type="button" 
+                    className="btn btn-secondary"
+                    onClick={() => setShowAddEntryModal(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>

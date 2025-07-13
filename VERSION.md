@@ -1,7 +1,25 @@
 # TimeBeacon Version History
 
-## Version 2.1.0 - Dashboard Restructure (2025-01-13)
+## Version 2.2.0 - Enhanced Dashboard with Current Week Data (2025-07-13)
 **Status: Current**
+
+### Changes Made:
+- ✅ Fixed mock data to show current week (July 13, 2025) instead of old dates
+- ✅ Week format confirmed as Sunday-Saturday 
+- ✅ Redesigned header layout: Previous Week, Date Range, Next Week all on same line
+- ✅ Add Entry button positioned below navigation with Current Week button
+- ✅ Created proper Add Entry popup modal with form validation
+- ✅ Fixed issue where Add Entry created random Salesforce entries
+- ✅ Enhanced form with client/project dropdowns and proper validation
+
+### Files Modified:
+- `src/mockData.ts` (updated all dates to current week)
+- `src/components/Dashboard.tsx` (layout fixes and Add Entry modal)
+
+---
+
+## Version 2.1.0 - Dashboard Restructure (2025-01-13)
+**Status: Superseded**
 
 ### Changes Made:
 - Renamed WeeklyCalendar component to Dashboard (main view)
