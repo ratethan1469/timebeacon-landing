@@ -1,0 +1,15 @@
+{
+  "version": "2.1.0",
+  "name": "Dashboard Restructure",
+  "deployedAt": "2025-01-13T22:00:00Z",
+  "commit": "auto-generated",
+  "features": [
+    "Dashboard as main time tracking interface",
+    "Simplified navigation structure",
+    "Enhanced time tracking with mock data",
+    "Week navigation and bulk actions",
+    "TypeScript error fixes"
+  ],
+  "rollbackCommand": "git revert HEAD && git push origin main",
+  "previousVersion": "2.0.0"
+}

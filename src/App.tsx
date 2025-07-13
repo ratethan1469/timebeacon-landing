@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { Dashboard } from './components/Dashboard';
-import { WeeklyCalendar } from './components/WeeklyCalendar';
 import { Reports } from './components/Reports';
 import { Settings } from './components/Settings';
 import { Integrations } from './components/Integrations';
@@ -58,17 +57,6 @@ function App() {
       case 'dashboard':
         return (
           <Dashboard 
-            stats={timeTracker.stats}
-            entries={timeTracker.timeEntries}
-            projects={timeTracker.projects}
-            onAddEntry={timeTracker.addTimeEntry}
-            onUpdateEntry={timeTracker.updateTimeEntry}
-            onDeleteEntry={timeTracker.deleteTimeEntry}
-          />
-        );
-      case 'calendar':
-        return (
-          <WeeklyCalendar 
             entries={timeTracker.timeEntries}
             projects={timeTracker.projects}
             clients={timeTracker.clients}
@@ -142,12 +130,13 @@ function App() {
         );
       default:
         return (
-          <WeeklyCalendar 
+          <Dashboard 
             entries={timeTracker.timeEntries}
             projects={timeTracker.projects}
             clients={timeTracker.clients}
             onUpdateEntry={timeTracker.updateTimeEntry}
             onDeleteEntry={timeTracker.deleteTimeEntry}
+            onAddEntry={timeTracker.addTimeEntry}
           />
         );
     }

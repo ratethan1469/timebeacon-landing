@@ -9,7 +9,6 @@ interface SidebarProps {
 
 const navigationItems = [
   { id: 'dashboard' as NavigationItem, label: 'Dashboard', icon: '📊' },
-  { id: 'calendar' as NavigationItem, label: 'Calendar', icon: '📅' },
   { id: 'reports' as NavigationItem, label: 'Reports', icon: '📈' },
   { id: 'ai-insights' as NavigationItem, label: 'AI Insights', icon: '🤖' },
   { id: 'privacy' as NavigationItem, label: 'Privacy & Data', icon: '🛡️' },

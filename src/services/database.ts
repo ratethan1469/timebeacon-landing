@@ -35,8 +35,9 @@ export class TimeBeaconDatabase {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(this.dbName, this.version);
 
-      request.onerror = () => {
-        console.error('Database failed to open');
+      request.onerror = (event) => {
+        console.error('Database failed to open:', event);
+        console.log('ℹ️ Database issue detected. Please refresh the page or clear browser cache.');
         reject(new Error('Failed to open database'));
       };
 

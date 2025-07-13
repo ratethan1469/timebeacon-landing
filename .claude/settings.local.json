@@ -22,7 +22,8 @@
       "Bash(npx tsc:*)",
       "Bash(touch:*)",
       "Bash(ls:*)",
-      "Bash(npx vite build:*)"
+      "Bash(npx vite build:*)",
+      "Bash(kill:*)"
     ],
     "deny": []
   }
