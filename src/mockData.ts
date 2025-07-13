@@ -451,10 +451,10 @@ export const mockTimeEntries: TimeEntry[] = [
     tags: ['all-hands', 'q2-results', 'roadmap']
   },
 
-  // Yesterday's entries  
+  // Yesterday's entries (Saturday, July 12th)  
   {
     id: '5',
-    date: '2025-07-14',
+    date: '2025-07-12',
     startTime: '09:00',
     endTime: '10:00',
     duration: 1,
@@ -472,7 +472,7 @@ export const mockTimeEntries: TimeEntry[] = [
   },
   {
     id: '6',
-    date: '2025-07-14',
+    date: '2025-07-12',
     startTime: '10:30',
     endTime: '11:00',
     duration: 0.5,
@@ -489,7 +489,7 @@ export const mockTimeEntries: TimeEntry[] = [
   },
   {
     id: '7',
-    date: '2025-07-14',
+    date: '2025-07-12',
     startTime: '14:00',
     endTime: '15:30',
     duration: 1.5,
@@ -507,7 +507,7 @@ export const mockTimeEntries: TimeEntry[] = [
   },
   {
     id: '8',
-    date: '2025-07-14',
+    date: '2025-07-11',
     startTime: '16:00',
     endTime: '16:45',
     duration: 0.75,
@@ -526,7 +526,7 @@ export const mockTimeEntries: TimeEntry[] = [
   // Day before yesterday (2024-06-27)
   {
     id: '9',
-    date: '2025-07-15',
+    date: '2025-07-10',
     startTime: '09:00',
     endTime: '10:30',
     duration: 1.5,
@@ -544,7 +544,7 @@ export const mockTimeEntries: TimeEntry[] = [
   },
   {
     id: '10',
-    date: '2025-07-15',
+    date: '2025-07-10',
     startTime: '11:00',
     endTime: '12:00',
     duration: 1,
@@ -561,7 +561,7 @@ export const mockTimeEntries: TimeEntry[] = [
   },
   {
     id: '11',
-    date: '2025-07-15',
+    date: '2025-07-10',
     startTime: '13:30',
     endTime: '14:30',
     duration: 1,
@@ -579,7 +579,7 @@ export const mockTimeEntries: TimeEntry[] = [
   },
   {
     id: '12',
-    date: '2025-07-15',
+    date: '2025-07-10',
     startTime: '15:30',
     endTime: '16:00',
     duration: 0.5,
@@ -596,7 +596,7 @@ export const mockTimeEntries: TimeEntry[] = [
   // Earlier in the week (2024-06-26)
   {
     id: '13',
-    date: '2025-07-16',
+    date: '2025-07-09',
     startTime: '10:00',
     endTime: '11:30',
     duration: 1.5,
@@ -614,7 +614,7 @@ export const mockTimeEntries: TimeEntry[] = [
   },
   {
     id: '14',
-    date: '2025-07-16',
+    date: '2025-07-09',
     startTime: '14:00',
     endTime: '15:00',
     duration: 1,
@@ -632,7 +632,7 @@ export const mockTimeEntries: TimeEntry[] = [
   },
   {
     id: '15',
-    date: '2025-07-16',
+    date: '2025-07-09',
     startTime: '16:30',
     endTime: '17:00',
     duration: 0.5,
@@ -651,7 +651,7 @@ export const mockTimeEntries: TimeEntry[] = [
   // Earlier (2024-06-25)
   {
     id: '16',
-    date: '2025-07-17',
+    date: '2025-07-08',
     startTime: '09:00',
     endTime: '09:30',
     duration: 0.5,
@@ -668,7 +668,7 @@ export const mockTimeEntries: TimeEntry[] = [
   },
   {
     id: '17',
-    date: '2025-07-17',
+    date: '2025-07-08',
     startTime: '11:00',
     endTime: '12:00',
     duration: 1,
@@ -686,7 +686,7 @@ export const mockTimeEntries: TimeEntry[] = [
   },
   {
     id: '18',
-    date: '2025-07-17',
+    date: '2025-07-08',
     startTime: '15:00',
     endTime: '16:00',
     duration: 1,
@@ -705,7 +705,7 @@ export const mockTimeEntries: TimeEntry[] = [
   // More varied meeting types across different days
   {
     id: '19',
-    date: '2025-07-18',
+    date: '2025-07-07',
     startTime: '09:30',
     endTime: '10:30',
     duration: 1,
@@ -723,7 +723,7 @@ export const mockTimeEntries: TimeEntry[] = [
   },
   {
     id: '20',
-    date: '2025-07-18',
+    date: '2025-07-07',
     startTime: '13:00',
     endTime: '14:30',
     duration: 1.5,
@@ -740,7 +740,7 @@ export const mockTimeEntries: TimeEntry[] = [
   },
   {
     id: '21',
-    date: '2025-07-19',
+    date: '2025-07-06',
     startTime: '10:00',
     endTime: '11:00',
     duration: 1,
@@ -758,7 +758,7 @@ export const mockTimeEntries: TimeEntry[] = [
   },
   {
     id: '22',
-    date: '2025-07-19',
+    date: '2025-07-06',
     startTime: '14:00',
     endTime: '15:00',
     duration: 1,

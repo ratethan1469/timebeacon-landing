@@ -68,6 +68,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
     count: 4,
     skipWeekends: true
   });
+  const [isGenerating, setIsGenerating] = useState(false);
   const [addEntryForm, setAddEntryForm] = useState({
     date: new Date().toISOString().split('T')[0],
     startTime: '09:00',
@@ -283,13 +284,77 @@ export const Dashboard: React.FC<DashboardProps> = ({
     setShowDuplicateModal(true);
   };
 
-  const generateDuplicates = () => {
+  const generateDuplicates = async () => {
     if (!duplicatingEntry || !onAddEntry) return;
 
-    const duplicates: Omit<TimeEntry, 'id'>[] = [];
-    const startDate = new Date(duplicatingEntry.date);
+    setIsGenerating(true);
     
-    for (let i = 1; i <= duplicateSettings.count; i++) {
+    try {
+      const duplicates: Omit<TimeEntry, 'id'>[] = [];
+      const startDate = new Date(duplicatingEntry.date);
+      let actualCount = 0;
+      
+      for (let i = 1; i <= duplicateSettings.count && actualCount < duplicateSettings.count; i++) {
+        const newDate = new Date(startDate);
+        
+        switch (duplicateSettings.frequency) {
+          case 'daily':
+            newDate.setDate(startDate.getDate() + i);
+            break;
+          case 'weekly':
+            newDate.setDate(startDate.getDate() + (i * 7));
+            break;
+          case 'monthly':
+            newDate.setMonth(startDate.getMonth() + i);
+            break;
+        }
+
+        // Skip weekends if option is enabled
+        if (duplicateSettings.skipWeekends) {
+          const dayOfWeek = newDate.getDay();
+          if (dayOfWeek === 0 || dayOfWeek === 6) {
+            // Don't count this as one of our duplicates, try next date
+            continue;
+          }
+        }
+
+        duplicates.push({
+          ...duplicatingEntry,
+          date: newDate.toISOString().split('T')[0],
+          status: 'pending' // Reset status for duplicates
+        });
+        
+        actualCount++;
+      }
+
+      // Create all duplicate entries with a small delay for smooth UX
+      for (const duplicate of duplicates) {
+        onAddEntry(duplicate);
+        await new Promise(resolve => setTimeout(resolve, 50)); // Small delay between additions
+      }
+
+      // Success feedback
+      setTimeout(() => {
+        setShowDuplicateModal(false);
+        setDuplicatingEntry(null);
+        setIsGenerating(false);
+      }, 200);
+      
+    } catch (error) {
+      console.error('Error generating duplicates:', error);
+      setIsGenerating(false);
+    }
+  };
+
+  // Helper function to preview upcoming dates
+  const getPreviewDates = () => {
+    if (!duplicatingEntry) return [];
+    
+    const startDate = new Date(duplicatingEntry.date);
+    const previewDates: Date[] = [];
+    let actualCount = 0;
+    
+    for (let i = 1; i <= duplicateSettings.count && actualCount < Math.min(duplicateSettings.count, 5); i++) {
       const newDate = new Date(startDate);
       
       switch (duplicateSettings.frequency) {
@@ -304,29 +369,18 @@ export const Dashboard: React.FC<DashboardProps> = ({
           break;
       }
 
-      // Skip weekends if option is enabled
       if (duplicateSettings.skipWeekends) {
         const dayOfWeek = newDate.getDay();
         if (dayOfWeek === 0 || dayOfWeek === 6) {
-          // Skip this iteration for weekends
           continue;
         }
       }
 
-      duplicates.push({
-        ...duplicatingEntry,
-        date: newDate.toISOString().split('T')[0],
-        status: 'pending' // Reset status for duplicates
-      });
+      previewDates.push(newDate);
+      actualCount++;
     }
-
-    // Create all duplicate entries
-    duplicates.forEach(duplicate => {
-      onAddEntry(duplicate);
-    });
-
-    setShowDuplicateModal(false);
-    setDuplicatingEntry(null);
+    
+    return previewDates;
   };
 
   const convertCalendarEventToTimeEntry = (event: CalendarEvent) => {
@@ -941,9 +995,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
       {/* Add Entry Modal */}
       {showAddEntryModal && (
         <div className="modal-overlay" onClick={() => setShowAddEntryModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content add-entry-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>➕ Add New Time Entry</h3>
+              <h3>✨ Create New Time Entry</h3>
               <button 
                 className="modal-close"
                 onClick={() => setShowAddEntryModal(false)}
@@ -952,111 +1006,149 @@ export const Dashboard: React.FC<DashboardProps> = ({
               </button>
             </div>
             <div className="modal-body">
-              <form onSubmit={handleAddEntrySubmit} className="entry-form">
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>Date</label>
-                    <input
-                      type="date"
-                      value={addEntryForm.date}
-                      onChange={(e) => setAddEntryForm({ ...addEntryForm, date: e.target.value })}
-                      className="form-input"
-                      required
-                    />
+              <form onSubmit={handleAddEntrySubmit} className="entry-form enhanced-form">
+                {/* Quick Info Preview */}
+                <div className="entry-preview">
+                  <div className="preview-header">
+                    <span className="preview-icon">⏰</span>
+                    <div>
+                      <div className="preview-time">
+                        {new Date(addEntryForm.date).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })} • {addEntryForm.startTime} • {formatHours(addEntryForm.duration)}
+                      </div>
+                      <div className="preview-end-time">
+                        Ends at {calculateEndTime(addEntryForm.startTime, addEntryForm.duration)}
+                      </div>
+                    </div>
                   </div>
-                  <div className="form-group">
-                    <label>Start Time</label>
-                    <input
-                      type="time"
-                      value={addEntryForm.startTime}
-                      onChange={(e) => setAddEntryForm({ ...addEntryForm, startTime: e.target.value })}
-                      className="form-input"
-                      required
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Duration (hours)</label>
-                    <input
-                      type="number"
-                      min="0.25"
-                      max="24"
-                      step="0.25"
-                      value={addEntryForm.duration}
-                      onChange={(e) => setAddEntryForm({ ...addEntryForm, duration: parseFloat(e.target.value) || 1 })}
-                      className="form-input"
-                      required
-                    />
+                </div>
+
+                <div className="form-section">
+                  <h4 className="section-title">📅 When & How Long</h4>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>📅 Date</label>
+                      <input
+                        type="date"
+                        value={addEntryForm.date}
+                        onChange={(e) => setAddEntryForm({ ...addEntryForm, date: e.target.value })}
+                        className="form-input enhanced-input"
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>🕐 Start Time</label>
+                      <input
+                        type="time"
+                        value={addEntryForm.startTime}
+                        onChange={(e) => setAddEntryForm({ ...addEntryForm, startTime: e.target.value })}
+                        className="form-input enhanced-input"
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>⏱️ Duration</label>
+                      <div className="duration-input-wrapper">
+                        <input
+                          type="number"
+                          min="0.25"
+                          max="24"
+                          step="0.25"
+                          value={addEntryForm.duration}
+                          onChange={(e) => setAddEntryForm({ ...addEntryForm, duration: parseFloat(e.target.value) || 1 })}
+                          className="form-input enhanced-input"
+                          required
+                        />
+                        <span className="input-suffix">hours</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>Client</label>
-                    <select
-                      value={addEntryForm.client}
-                      onChange={(e) => setAddEntryForm({ ...addEntryForm, client: e.target.value })}
-                      className="form-input"
-                      required
-                    >
-                      <option value="">Select Client</option>
-                      {clients.map(client => (
-                        <option key={client.id} value={client.name}>
-                          {client.name}
+                <div className="form-section">
+                  <h4 className="section-title">🏢 Client & Project</h4>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>🏢 Client</label>
+                      <select
+                        value={addEntryForm.client}
+                        onChange={(e) => setAddEntryForm({ ...addEntryForm, client: e.target.value, project: '' })}
+                        className="form-input enhanced-input"
+                        required
+                      >
+                        <option value="">Choose a client...</option>
+                        {clients.map(client => (
+                          <option key={client.id} value={client.name}>
+                            {client.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label>📂 Project</label>
+                      <select
+                        value={addEntryForm.project}
+                        onChange={(e) => setAddEntryForm({ ...addEntryForm, project: e.target.value })}
+                        className="form-input enhanced-input"
+                        required
+                        disabled={!addEntryForm.client}
+                      >
+                        <option value="">
+                          {addEntryForm.client ? 'Choose a project...' : 'Select client first'}
                         </option>
-                      ))}
-                    </select>
+                        {projects
+                          .filter(p => p.active && p.client === addEntryForm.client)
+                          .map(project => (
+                            <option key={project.id} value={project.name}>
+                              {project.name}
+                            </option>
+                          ))}
+                      </select>
+                    </div>
                   </div>
+                </div>
+                
+                <div className="form-section">
+                  <h4 className="section-title">📝 Work Description</h4>
                   <div className="form-group">
-                    <label>Project</label>
-                    <select
-                      value={addEntryForm.project}
-                      onChange={(e) => setAddEntryForm({ ...addEntryForm, project: e.target.value })}
-                      className="form-input"
+                    <label>💬 What did you work on?</label>
+                    <textarea
+                      value={addEntryForm.description}
+                      onChange={(e) => setAddEntryForm({ ...addEntryForm, description: e.target.value })}
+                      className="form-input enhanced-input"
+                      rows={3}
+                      placeholder="Describe the work you completed..."
                       required
-                    >
-                      <option value="">Select Project</option>
-                      {projects.filter(p => p.active && (!addEntryForm.client || p.client === addEntryForm.client)).map(project => (
-                        <option key={project.id} value={project.name}>
-                          {project.name}
-                        </option>
-                      ))}
-                    </select>
+                    />
                   </div>
                 </div>
                 
-                <div className="form-group">
-                  <label>Description</label>
-                  <textarea
-                    value={addEntryForm.description}
-                    onChange={(e) => setAddEntryForm({ ...addEntryForm, description: e.target.value })}
-                    className="form-input"
-                    rows={3}
-                    placeholder="What did you work on?"
-                    required
-                  />
+                <div className="form-section">
+                  <div className="billable-toggle">
+                    <label className="toggle-label">
+                      <input
+                        type="checkbox"
+                        checked={addEntryForm.billable}
+                        onChange={(e) => setAddEntryForm({ ...addEntryForm, billable: e.target.checked })}
+                        className="toggle-input"
+                      />
+                      <span className="toggle-slider"></span>
+                      <span className="toggle-text">
+                        💰 Billable {addEntryForm.billable ? '(This work can be billed to the client)' : '(Internal time, not billable)'}
+                      </span>
+                    </label>
+                  </div>
                 </div>
                 
-                <div className="form-group">
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <input
-                      type="checkbox"
-                      checked={addEntryForm.billable}
-                      onChange={(e) => setAddEntryForm({ ...addEntryForm, billable: e.target.checked })}
-                    />
-                    Billable
-                  </label>
-                </div>
-                
-                <div className="form-actions">
-                  <button type="submit" className="btn btn-primary">
-                    Add Entry
-                  </button>
+                <div className="form-actions enhanced-actions">
                   <button 
                     type="button" 
                     className="btn btn-secondary"
                     onClick={() => setShowAddEntryModal(false)}
                   >
                     Cancel
+                  </button>
+                  <button type="submit" className="btn btn-primary btn-large">
+                    ✨ Create Time Entry
                   </button>
                 </div>
               </form>
@@ -1067,78 +1159,129 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
       {/* Duplicate Entry Modal */}
       {showDuplicateModal && duplicatingEntry && (
-        <div className="modal-overlay" onClick={() => setShowDuplicateModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-overlay" onClick={() => !isGenerating && setShowDuplicateModal(false)}>
+          <div className="modal-content duplicate-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>📋 Duplicate Entry for Recurring Meetings</h3>
+              <h3>🔄 Create Recurring Time Entries</h3>
               <button 
                 className="modal-close"
-                onClick={() => setShowDuplicateModal(false)}
+                onClick={() => !isGenerating && setShowDuplicateModal(false)}
+                disabled={isGenerating}
               >
                 ×
               </button>
             </div>
             <div className="modal-body">
               {/* Entry Preview */}
-              <div style={{ background: 'var(--background-secondary)', padding: '16px', borderRadius: '8px', marginBottom: '24px' }}>
-                <h4 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px', color: 'var(--text-primary)' }}>
-                  {duplicatingEntry.project} • {duplicatingEntry.client}
-                </h4>
-                <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
-                  {new Date(duplicatingEntry.date).toLocaleDateString()} • {formatTimeRange(duplicatingEntry.startTime, duplicatingEntry.endTime)}
-                  <br />
+              <div className="duplicate-preview-card">
+                <div className="preview-header">
+                  <span className="preview-icon">📋</span>
+                  <div>
+                    <h4 className="preview-title">
+                      {duplicatingEntry.project} • {duplicatingEntry.client}
+                    </h4>
+                    <div className="preview-details">
+                      {new Date(duplicatingEntry.date).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })} • {formatTimeRange(duplicatingEntry.startTime, duplicatingEntry.endTime)} • {formatHours(duplicatingEntry.duration)}
+                    </div>
+                  </div>
+                </div>
+                <div className="preview-description">
                   {duplicatingEntry.description}
                 </div>
               </div>
 
-              <div className="form-group">
-                <label>Frequency</label>
-                <select
-                  value={duplicateSettings.frequency}
-                  onChange={(e) => setDuplicateSettings({ ...duplicateSettings, frequency: e.target.value as 'weekly' | 'daily' | 'monthly' })}
-                  className="form-input"
-                >
-                  <option value="daily">Daily</option>
-                  <option value="weekly">Weekly</option>
-                  <option value="monthly">Monthly</option>
-                </select>
+              <div className="duplicate-settings">
+                <div className="settings-grid">
+                  <div className="form-group">
+                    <label>🔄 Frequency</label>
+                    <select
+                      value={duplicateSettings.frequency}
+                      onChange={(e) => setDuplicateSettings({ ...duplicateSettings, frequency: e.target.value as 'weekly' | 'daily' | 'monthly' })}
+                      className="form-input"
+                      disabled={isGenerating}
+                    >
+                      <option value="daily">📅 Daily</option>
+                      <option value="weekly">📆 Weekly</option>
+                      <option value="monthly">🗓️ Monthly</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label>📊 Count</label>
+                    <div className="count-input-wrapper">
+                      <input
+                        type="number"
+                        min="1"
+                        max="52"
+                        value={duplicateSettings.count}
+                        onChange={(e) => setDuplicateSettings({ ...duplicateSettings, count: parseInt(e.target.value) || 1 })}
+                        className="form-input"
+                        disabled={isGenerating}
+                      />
+                      <span className="count-label">occurrences</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={duplicateSettings.skipWeekends}
+                      onChange={(e) => setDuplicateSettings({ ...duplicateSettings, skipWeekends: e.target.checked })}
+                      disabled={isGenerating}
+                    />
+                    <span className="checkbox-text">🚫 Skip weekends (Saturday & Sunday)</span>
+                  </label>
+                </div>
               </div>
 
-              <div className="form-group">
-                <label>Number of occurrences</label>
-                <input
-                  type="number"
-                  min="1"
-                  max="52"
-                  value={duplicateSettings.count}
-                  onChange={(e) => setDuplicateSettings({ ...duplicateSettings, count: parseInt(e.target.value) || 1 })}
-                  className="form-input"
-                />
-              </div>
-
-              <div className="form-group">
-                <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <input
-                    type="checkbox"
-                    checked={duplicateSettings.skipWeekends}
-                    onChange={(e) => setDuplicateSettings({ ...duplicateSettings, skipWeekends: e.target.checked })}
-                  />
-                  Skip weekends
-                </label>
+              {/* Preview upcoming dates */}
+              <div className="dates-preview">
+                <h4 className="preview-section-title">📅 Upcoming dates preview:</h4>
+                <div className="dates-list">
+                  {getPreviewDates().map((date, index) => (
+                    <div key={index} className="date-item">
+                      <span className="date-number">{index + 1}</span>
+                      <span className="date-text">
+                        {date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+                      </span>
+                    </div>
+                  ))}
+                  {duplicateSettings.count > 5 && (
+                    <div className="date-item more-dates">
+                      <span className="date-number">...</span>
+                      <span className="date-text">
+                        +{duplicateSettings.count - 5} more dates
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
             <div className="modal-footer">
               <button 
                 className="btn btn-secondary"
                 onClick={() => setShowDuplicateModal(false)}
+                disabled={isGenerating}
               >
                 Cancel
               </button>
               <button 
                 className="btn btn-primary"
                 onClick={generateDuplicates}
+                disabled={isGenerating}
               >
-                Create {duplicateSettings.count} Duplicates
+                {isGenerating ? (
+                  <>
+                    <span className="spinner">⏳</span>
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    ✨ Create {duplicateSettings.count} Duplicates
+                  </>
+                )}
               </button>
             </div>
           </div>
