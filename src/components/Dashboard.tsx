@@ -410,14 +410,26 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
         
         {/* Top Line: Previous Week | Week Listed | Next Week */}
-        <div className="week-navigation" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          gap: '16px', 
+          marginBottom: '16px',
+          width: '100%'
+        }}>
           <button 
             className="btn btn-secondary"
             onClick={() => navigateWeek('prev')}
           >
             Previous Week
           </button>
-          <span className="week-range" style={{ fontWeight: '600', fontSize: '16px', minWidth: '200px', textAlign: 'center' }}>
+          <span style={{ 
+            fontWeight: '600', 
+            fontSize: '16px', 
+            minWidth: '200px', 
+            textAlign: 'center' 
+          }}>
             {weekRange}
           </span>
           <button 
@@ -429,7 +441,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
         
         {/* Bottom Line: Add Entry and Current Week buttons */}
-        <div className="action-buttons" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px' }}>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          gap: '12px',
+          marginTop: '8px',
+          width: '100%'
+        }}>
           <button 
             className="btn btn-primary"
             onClick={() => setShowAddEntryModal(true)}
