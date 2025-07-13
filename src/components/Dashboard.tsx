@@ -60,6 +60,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const [showDurationModal, setShowDurationModal] = useState(false);
   const [newDuration, setNewDuration] = useState(0);
   const [showAddEntryModal, setShowAddEntryModal] = useState(false);
+  const [selectedEntries, setSelectedEntries] = useState<Set<string>>(new Set());
   const [addEntryForm, setAddEntryForm] = useState({
     date: new Date().toISOString().split('T')[0],
     startTime: '09:00',
@@ -247,6 +248,24 @@ export const Dashboard: React.FC<DashboardProps> = ({
     setShowAddEntryModal(false);
   };
 
+  const handleEntrySelect = (entryId: string, checked: boolean) => {
+    const newSelected = new Set(selectedEntries);
+    if (checked) {
+      newSelected.add(entryId);
+    } else {
+      newSelected.delete(entryId);
+    }
+    setSelectedEntries(newSelected);
+  };
+
+
+  const handleBulkStatusUpdate = (newStatus: TimeEntry['status']) => {
+    selectedEntries.forEach(entryId => {
+      onUpdateEntry(entryId, { status: newStatus });
+    });
+    setSelectedEntries(new Set());
+  };
+
   const convertCalendarEventToTimeEntry = (event: CalendarEvent) => {
     if (!onAddEntry) {
       console.warn('onAddEntry prop not provided, cannot convert calendar event');
@@ -428,6 +447,35 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
       </div>
 
+      {/* Bulk Actions */}
+      {selectedEntries.size > 0 && (
+        <div className="content-card" style={{ marginBottom: '24px', background: 'var(--brand-primary-light)', border: '2px solid var(--brand-primary)' }}>
+          <div style={{ padding: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
+            <span style={{ fontWeight: '600', color: 'var(--brand-primary)' }}>
+              {selectedEntries.size} entries selected
+            </span>
+            <button 
+              className="btn btn-secondary btn-small"
+              onClick={() => handleBulkStatusUpdate('pending')}
+            >
+              Mark as Pending
+            </button>
+            <button 
+              className="btn btn-primary btn-small"
+              onClick={() => handleBulkStatusUpdate('approved')}
+            >
+              Mark as Approved
+            </button>
+            <button 
+              className="btn btn-secondary btn-small"
+              onClick={() => setSelectedEntries(new Set())}
+            >
+              Clear Selection
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="week-summary">
         <div className="summary-card">
           <div className="summary-label">Total Hours This Week</div>
@@ -524,6 +572,19 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   <div className="day-date">{formatDate(date)}</div>
                 </div>
                 <div className="day-total">
+                  {dayEntries.length > 0 && (
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', marginBottom: '4px' }}>
+                      <input
+                        type="checkbox"
+                        checked={dayEntries.every(entry => selectedEntries.has(entry.id))}
+                        onChange={(e) => {
+                          dayEntries.forEach(entry => handleEntrySelect(entry.id, e.target.checked));
+                        }}
+                        style={{ margin: 0 }}
+                      />
+                      All
+                    </label>
+                  )}
                   {totalHours > 0 && (
                     <span className="hours-badge">{formatHours(totalHours)}</span>
                   )}
@@ -560,8 +621,16 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     return (
                       <div key={entry.id} className="time-entry-card">
                         <div className="entry-header">
-                          <div className="entry-time">
-                            {formatTimeRange(entry.startTime, entry.endTime)}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <input
+                              type="checkbox"
+                              checked={selectedEntries.has(entry.id)}
+                              onChange={(e) => handleEntrySelect(entry.id, e.target.checked)}
+                              style={{ margin: 0 }}
+                            />
+                            <div className="entry-time">
+                              {formatTimeRange(entry.startTime, entry.endTime)}
+                            </div>
                           </div>
                           <div className="entry-duration">
                             {formatHours(entry.duration)}
