@@ -57,9 +57,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
 }) => {
   const [currentWeek, setCurrentWeek] = useState(new Date());
   const [editingEntry, setEditingEntry] = useState<TimeEntry | null>(null);
-  const [showDurationModal, setShowDurationModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [newDuration, setNewDuration] = useState(0);
-  const [showDescriptionModal, setShowDescriptionModal] = useState(false);
   const [newDescription, setNewDescription] = useState('');
   const [showAddEntryModal, setShowAddEntryModal] = useState(false);
   const [selectedEntries, setSelectedEntries] = useState<Set<string>>(new Set());
@@ -211,24 +210,25 @@ export const Dashboard: React.FC<DashboardProps> = ({
     onUpdateEntry(entryId, { status: newStatus });
   };
 
-  const handleEditDuration = (entry: TimeEntry) => {
+  const handleEditEntry = (entry: TimeEntry) => {
     setEditingEntry(entry);
     setNewDuration(entry.duration);
-    setShowDurationModal(true);
-  };
-
-  const handleEditDescription = (entry: TimeEntry) => {
-    setEditingEntry(entry);
     setNewDescription(entry.description);
-    setShowDescriptionModal(true);
+    setShowEditModal(true);
   };
 
-  const saveDescriptionChange = () => {
-    if (editingEntry && newDescription.trim()) {
-      onUpdateEntry(editingEntry.id, { description: newDescription.trim() });
-      setShowDescriptionModal(false);
+  const saveEntryChanges = () => {
+    if (editingEntry && newDescription.trim() && newDuration > 0) {
+      const endTime = calculateEndTime(editingEntry.startTime, newDuration);
+      onUpdateEntry(editingEntry.id, { 
+        description: newDescription.trim(),
+        duration: newDuration,
+        endTime: endTime
+      });
+      setShowEditModal(false);
       setEditingEntry(null);
       setNewDescription('');
+      setNewDuration(0);
     }
   };
 
@@ -240,17 +240,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
     return `${endHours.toString().padStart(2, '0')}:${endMinutes.toString().padStart(2, '0')}`;
   };
 
-  const saveDurationChange = () => {
-    if (editingEntry && newDuration > 0) {
-      const endTime = calculateEndTime(editingEntry.startTime, newDuration);
-      onUpdateEntry(editingEntry.id, { 
-        duration: newDuration,
-        endTime: endTime
-      });
-      setShowDurationModal(false);
-      setEditingEntry(null);
-    }
-  };
 
   const adjustDuration = (increment: number) => {
     const adjusted = Math.max(0.25, newDuration + increment); // Minimum 15 minutes
@@ -848,15 +837,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
                           </select>
                           <button 
                             className="btn btn-small btn-secondary"
-                            onClick={() => handleEditDuration(entry)}
-                            title="Edit duration"
-                          >
-                            ⏱️
-                          </button>
-                          <button 
-                            className="btn btn-small btn-secondary"
-                            onClick={() => handleEditDescription(entry)}
-                            title="Edit description"
+                            onClick={() => handleEditEntry(entry)}
+                            title="Edit entry"
                           >
                             ✏️
                           </button>
@@ -888,15 +870,15 @@ export const Dashboard: React.FC<DashboardProps> = ({
         })}
       </div>
 
-      {/* Duration Edit Modal */}
-      {showDurationModal && editingEntry && (
-        <div className="modal-overlay" onClick={() => setShowDurationModal(false)}>
+      {/* Combined Edit Entry Modal */}
+      {showEditModal && editingEntry && (
+        <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>✏️ Edit Duration</h3>
+              <h3>✏️ Edit Time Entry</h3>
               <button 
                 className="modal-close"
-                onClick={() => setShowDurationModal(false)}
+                onClick={() => setShowEditModal(false)}
               >
                 ×
               </button>
@@ -909,27 +891,37 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 </h4>
                 <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
                   {new Date(editingEntry.date).toLocaleDateString()} • {formatTimeRange(editingEntry.startTime, editingEntry.endTime)}
-                  <br />
-                  {editingEntry.description}
                 </div>
               </div>
 
-              {/* Duration Controls */}
-              <div style={{ textAlign: 'center' }}>
-                <h4 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '24px', color: 'var(--text-primary)' }}>
-                  Adjust Time Duration
+              {/* Description Section */}
+              <div className="form-group" style={{ marginBottom: '24px' }}>
+                <label style={{ fontWeight: '600', marginBottom: '8px', display: 'block' }}>
+                  Description:
+                </label>
+                <textarea
+                  value={newDescription}
+                  onChange={(e) => setNewDescription(e.target.value)}
+                  className="form-input"
+                  rows={3}
+                  placeholder="Describe what you worked on..."
+                  style={{ width: '100%', resize: 'vertical' }}
+                />
+              </div>
+
+              {/* Duration Section */}
+              <div style={{ borderTop: '1px solid var(--border)', paddingTop: '24px' }}>
+                <h4 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '16px', color: 'var(--text-primary)' }}>
+                  Duration
                 </h4>
                 
                 {/* Current Duration Display */}
                 <div style={{ 
-                  fontSize: '32px', 
+                  fontSize: '24px', 
                   fontWeight: '700', 
                   color: 'var(--brand-primary)', 
-                  marginBottom: '24px',
-                  padding: '16px',
-                  background: 'var(--brand-primary-light)',
-                  borderRadius: '12px',
-                  border: '2px solid var(--brand-primary)'
+                  marginBottom: '16px',
+                  textAlign: 'center'
                 }}>
                   {formatDurationHours(newDuration)}
                 </div>
@@ -937,63 +929,35 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 {/* Quick Adjustment Buttons */}
                 <div style={{ 
                   display: 'grid', 
-                  gridTemplateColumns: 'repeat(2, 1fr)', 
-                  gap: '12px', 
-                  marginBottom: '24px',
-                  maxWidth: '300px',
-                  margin: '0 auto 24px auto'
+                  gridTemplateColumns: 'repeat(3, 1fr)', 
+                  gap: '8px', 
+                  marginBottom: '16px'
                 }}>
                   <button 
-                    className="btn btn-secondary"
+                    className="btn btn-secondary btn-small"
                     onClick={() => adjustDuration(-0.25)}
                     disabled={newDuration <= 0.25}
-                    style={{ fontSize: '16px', padding: '12px' }}
                   >
                     − 15min
                   </button>
                   <button 
-                    className="btn btn-secondary"
+                    className="btn btn-secondary btn-small"
                     onClick={() => adjustDuration(0.25)}
-                    style={{ fontSize: '16px', padding: '12px' }}
                   >
                     + 15min
                   </button>
                   <button 
-                    className="btn btn-secondary"
-                    onClick={() => adjustDuration(-0.5)}
-                    disabled={newDuration <= 0.5}
-                    style={{ fontSize: '16px', padding: '12px' }}
-                  >
-                    − 30min
-                  </button>
-                  <button 
-                    className="btn btn-secondary"
+                    className="btn btn-secondary btn-small"
                     onClick={() => adjustDuration(0.5)}
-                    style={{ fontSize: '16px', padding: '12px' }}
                   >
                     + 30min
-                  </button>
-                  <button 
-                    className="btn btn-secondary"
-                    onClick={() => adjustDuration(-1)}
-                    disabled={newDuration <= 1}
-                    style={{ fontSize: '16px', padding: '12px' }}
-                  >
-                    − 1hr
-                  </button>
-                  <button 
-                    className="btn btn-secondary"
-                    onClick={() => adjustDuration(1)}
-                    style={{ fontSize: '16px', padding: '12px' }}
-                  >
-                    + 1hr
                   </button>
                 </div>
 
                 {/* Precise Input */}
-                <div className="form-group" style={{ marginBottom: '24px' }}>
+                <div className="form-group">
                   <label style={{ fontWeight: '600', marginBottom: '8px', display: 'block' }}>
-                    Or set exact duration (hours):
+                    Exact duration (hours):
                   </label>
                   <input
                     type="number"
@@ -1006,11 +970,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       setNewDuration(Math.max(0.25, Math.round(value * 4) / 4));
                     }}
                     className="form-input"
-                    style={{ textAlign: 'center', fontSize: '16px' }}
+                    style={{ textAlign: 'center' }}
                   />
-                  <small style={{ color: 'var(--text-secondary)', fontSize: '12px', marginTop: '4px', display: 'block' }}>
-                    Minimum 15 minutes (0.25 hours)
-                  </small>
                 </div>
 
                 {/* New End Time Preview */}
@@ -1018,10 +979,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   background: 'var(--info-light)', 
                   padding: '12px', 
                   borderRadius: '8px',
-                  marginBottom: '8px'
+                  marginTop: '12px'
                 }}>
-                  <p style={{ fontSize: '14px', color: 'var(--info-dark)', margin: 0 }}>
-                    <strong>New time range:</strong> {editingEntry.startTime} - {calculateEndTime(editingEntry.startTime, newDuration)}
+                  <p style={{ fontSize: '14px', color: 'var(--info-dark)', margin: 0, textAlign: 'center' }}>
+                    <strong>New time:</strong> {editingEntry.startTime} - {calculateEndTime(editingEntry.startTime, newDuration)}
                   </p>
                 </div>
               </div>
@@ -1029,85 +990,28 @@ export const Dashboard: React.FC<DashboardProps> = ({
             <div className="modal-footer">
               <button 
                 className="btn btn-secondary"
-                onClick={() => setShowDurationModal(false)}
+                onClick={() => setShowEditModal(false)}
               >
                 Cancel
               </button>
               <button 
                 className="btn btn-primary"
-                onClick={saveDurationChange}
-                disabled={newDuration <= 0}
+                onClick={saveEntryChanges}
+                disabled={!newDescription.trim() || newDuration <= 0}
               >
-                Save Duration
+                Save Changes
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Description Edit Modal */}
-      {showDescriptionModal && editingEntry && (
-        <div className="modal-overlay" onClick={() => setShowDescriptionModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>✏️ Edit Description</h3>
-              <button 
-                className="modal-close"
-                onClick={() => setShowDescriptionModal(false)}
-              >
-                ×
-              </button>
-            </div>
-            <div className="modal-body">
-              {/* Entry Preview */}
-              <div style={{ background: 'var(--background-secondary)', padding: '16px', borderRadius: '8px', marginBottom: '24px' }}>
-                <h4 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px', color: 'var(--text-primary)' }}>
-                  {editingEntry.project} • {editingEntry.client}
-                </h4>
-                <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
-                  {new Date(editingEntry.date).toLocaleDateString()} • {formatTimeRange(editingEntry.startTime, editingEntry.endTime)}
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label style={{ fontWeight: '600', marginBottom: '8px', display: 'block' }}>
-                  Description:
-                </label>
-                <textarea
-                  value={newDescription}
-                  onChange={(e) => setNewDescription(e.target.value)}
-                  className="form-input"
-                  rows={4}
-                  placeholder="Describe what you worked on..."
-                  style={{ width: '100%', resize: 'vertical' }}
-                />
-              </div>
-            </div>
-            <div className="modal-footer">
-              <button 
-                className="btn btn-secondary"
-                onClick={() => setShowDescriptionModal(false)}
-              >
-                Cancel
-              </button>
-              <button 
-                className="btn btn-primary"
-                onClick={saveDescriptionChange}
-                disabled={!newDescription.trim()}
-              >
-                Save Description
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Add Entry Modal */}
+      {/* Add Entry Modal - Simplified */}
       {showAddEntryModal && (
         <div className="modal-overlay" onClick={closeAddEntryModal}>
-          <div className="modal-content add-entry-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>✨ Create New Time Entry</h3>
+              <h3>Add New Time Entry</h3>
               <button 
                 className="modal-close"
                 onClick={closeAddEntryModal}
@@ -1116,126 +1020,107 @@ export const Dashboard: React.FC<DashboardProps> = ({
               </button>
             </div>
             <div className="modal-body">
-              <form onSubmit={handleAddEntrySubmit} className="entry-form enhanced-form">
+              <form onSubmit={handleAddEntrySubmit}>
+                <div className="form-group">
+                  <label>Date</label>
+                  <input
+                    type="date"
+                    value={addEntryForm.date}
+                    onChange={(e) => updateAddEntryForm({ date: e.target.value })}
+                    className="form-input"
+                    required
+                  />
+                </div>
 
-                <div className="form-section">
-                  <h4 className="section-title">📅 When & How Long</h4>
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label>📅 Date</label>
-                      <input
-                        type="date"
-                        value={addEntryForm.date}
-                        onChange={(e) => updateAddEntryForm({ date: e.target.value })}
-                        className="form-input enhanced-input"
-                        required
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label>🕐 Start Time</label>
-                      <input
-                        type="time"
-                        value={addEntryForm.startTime}
-                        onChange={(e) => setAddEntryForm({ ...addEntryForm, startTime: e.target.value })}
-                        className="form-input enhanced-input"
-                        required
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label>⏱️ Duration</label>
-                      <div className="duration-input-wrapper">
-                        <input
-                          type="number"
-                          min="0.25"
-                          max="24"
-                          step="0.25"
-                          value={addEntryForm.duration}
-                          onChange={(e) => setAddEntryForm({ ...addEntryForm, duration: parseFloat(e.target.value) || 1 })}
-                          className="form-input enhanced-input"
-                          required
-                        />
-                        <span className="input-suffix">hours</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="form-section">
-                  <h4 className="section-title">🏢 Client & Project</h4>
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label>🏢 Client</label>
-                      <select
-                        value={addEntryForm.client}
-                        onChange={(e) => setAddEntryForm({ ...addEntryForm, client: e.target.value, project: '' })}
-                        className="form-input enhanced-input"
-                        required
-                      >
-                        <option value="">Choose a client...</option>
-                        {clients.map(client => (
-                          <option key={client.id} value={client.name}>
-                            {client.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="form-group">
-                      <label>📂 Project</label>
-                      <select
-                        value={addEntryForm.project}
-                        onChange={(e) => setAddEntryForm({ ...addEntryForm, project: e.target.value })}
-                        className="form-input enhanced-input"
-                        required
-                        disabled={!addEntryForm.client}
-                      >
-                        <option value="">
-                          {addEntryForm.client ? 'Choose a project...' : 'Select client first'}
-                        </option>
-                        {projects
-                          .filter(p => p.active && p.client === addEntryForm.client)
-                          .map(project => (
-                            <option key={project.id} value={project.name}>
-                              {project.name}
-                            </option>
-                          ))}
-                      </select>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="form-section">
-                  <h4 className="section-title">📝 Work Description</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                   <div className="form-group">
-                    <label>💬 What did you work on?</label>
-                    <textarea
-                      value={addEntryForm.description}
-                      onChange={(e) => setAddEntryForm({ ...addEntryForm, description: e.target.value })}
-                      className="form-input enhanced-input"
-                      rows={3}
-                      placeholder="Describe the work you completed..."
+                    <label>Start Time</label>
+                    <input
+                      type="time"
+                      value={addEntryForm.startTime}
+                      onChange={(e) => setAddEntryForm({ ...addEntryForm, startTime: e.target.value })}
+                      className="form-input"
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Duration (hours)</label>
+                    <input
+                      type="number"
+                      min="0.25"
+                      max="24"
+                      step="0.25"
+                      value={addEntryForm.duration}
+                      onChange={(e) => setAddEntryForm({ ...addEntryForm, duration: parseFloat(e.target.value) || 1 })}
+                      className="form-input"
                       required
                     />
                   </div>
                 </div>
-                
-                <div className="form-section">
-                  <div className="billable-toggle">
-                    <label className="toggle-label">
-                      <input
-                        type="checkbox"
-                        checked={addEntryForm.billable}
-                        onChange={(e) => setAddEntryForm({ ...addEntryForm, billable: e.target.checked })}
-                        className="toggle-input"
-                      />
-                      <span className="toggle-slider"></span>
-                      <span className="toggle-text">
-                        💰 Billable {addEntryForm.billable ? '(This work can be billed to the client)' : '(Internal time, not billable)'}
-                      </span>
-                    </label>
-                  </div>
+
+                <div className="form-group">
+                  <label>Client</label>
+                  <select
+                    value={addEntryForm.client}
+                    onChange={(e) => setAddEntryForm({ ...addEntryForm, client: e.target.value, project: '' })}
+                    className="form-input"
+                    required
+                  >
+                    <option value="">Choose a client...</option>
+                    {clients.map(client => (
+                      <option key={client.id} value={client.name}>
+                        {client.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-                
-                <div className="form-actions enhanced-actions">
+
+                <div className="form-group">
+                  <label>Project</label>
+                  <select
+                    value={addEntryForm.project}
+                    onChange={(e) => setAddEntryForm({ ...addEntryForm, project: e.target.value })}
+                    className="form-input"
+                    required
+                    disabled={!addEntryForm.client}
+                  >
+                    <option value="">
+                      {addEntryForm.client ? 'Choose a project...' : 'Select client first'}
+                    </option>
+                    {projects
+                      .filter(p => p.active && p.client === addEntryForm.client)
+                      .map(project => (
+                        <option key={project.id} value={project.name}>
+                          {project.name}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Description</label>
+                  <textarea
+                    value={addEntryForm.description}
+                    onChange={(e) => setAddEntryForm({ ...addEntryForm, description: e.target.value })}
+                    className="form-input"
+                    rows={3}
+                    placeholder="Describe the work you completed..."
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <input
+                      type="checkbox"
+                      checked={addEntryForm.billable}
+                      onChange={(e) => setAddEntryForm({ ...addEntryForm, billable: e.target.checked })}
+                    />
+                    Billable
+                  </label>
+                </div>
+
+                <div className="modal-footer">
                   <button 
                     type="button" 
                     className="btn btn-secondary"
@@ -1243,8 +1128,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   >
                     Cancel
                   </button>
-                  <button type="submit" className="btn btn-primary btn-large">
-                    ✨ Create Time Entry
+                  <button type="submit" className="btn btn-primary">
+                    Create Entry
                   </button>
                 </div>
               </form>
