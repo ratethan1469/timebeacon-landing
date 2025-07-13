@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavigationItem } from '../types';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -18,6 +18,7 @@ const navigationItems = [
 
 export const Sidebar: React.FC<SidebarProps> = ({ activeItem, onItemClick }) => {
   const { theme, setTheme } = useTheme();
+  const [isCollapsed, setIsCollapsed] = useState(false);
   
   const toggleTheme = () => {
     const themes: Array<'light' | 'dark' | 'system'> = ['light', 'dark', 'system'];
@@ -34,16 +35,26 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeItem, onItemClick }) => 
       default: return '☀️';
     }
   };
+
   return (
-    <div className="sidebar">
+    <div className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
       <div className="sidebar-header">
         <div className="logo-container">
           <div className="logo-icon">⚡</div>
-          <div>
-            <h1 className="sidebar-title">TimeBeacon</h1>
-            <p className="sidebar-subtitle">AI-Powered Privacy-First</p>
-          </div>
+          {!isCollapsed && (
+            <div>
+              <h1 className="sidebar-title">TimeBeacon</h1>
+              <p className="sidebar-subtitle">AI-Powered Privacy-First</p>
+            </div>
+          )}
         </div>
+        <button 
+          className="collapse-toggle"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          {isCollapsed ? '▶' : '◀'}
+        </button>
       </div>
       <nav className="nav-menu">
         {navigationItems.map((item) => (
@@ -55,9 +66,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeItem, onItemClick }) => 
               e.preventDefault();
               onItemClick(item.id);
             }}
+            title={isCollapsed ? item.label : ''}
           >
             <span className="nav-icon">{item.icon}</span>
-            {item.label}
+            {!isCollapsed && <span className="nav-label">{item.label}</span>}
           </a>
         ))}
         
@@ -65,12 +77,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeItem, onItemClick }) => 
           <button 
             className="theme-toggle"
             onClick={toggleTheme}
-            title={`Current theme: ${theme}`}
+            title={isCollapsed ? `Theme: ${theme}` : `Current theme: ${theme}`}
           >
             <span className="nav-icon">{getThemeIcon()}</span>
-            <span className="theme-label">
-              {theme.charAt(0).toUpperCase() + theme.slice(1)}
-            </span>
+            {!isCollapsed && (
+              <span className="theme-label">
+                {theme.charAt(0).toUpperCase() + theme.slice(1)}
+              </span>
+            )}
           </button>
         </div>
       </nav>
