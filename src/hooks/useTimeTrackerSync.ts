@@ -3,8 +3,8 @@
  * Provides backward compatibility with existing components
  */
 
-import { useCallback } from 'react';
-import { TimeEntry, Project, Client, Settings } from '../types';
+import { useCallback, useMemo } from 'react';
+import { TimeEntry, Project, Client, Settings, DashboardStats } from '../types';
 import { useTimeTrackerDB } from './useTimeTrackerDB';
 
 // Convert UserSettings to Settings format for backward compatibility
@@ -163,12 +163,50 @@ export const useTimeTrackerSync = () => {
     db.toggleIntegration(integrationId);
   }, [db]);
 
+  // Calculate dashboard stats
+  const stats = useMemo((): DashboardStats => {
+    const today = new Date().toISOString().split('T')[0];
+    const now = new Date();
+    const weekStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay());
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const todayEntries = db.timeEntries.filter(entry => entry.date === today);
+    const weekEntries = db.timeEntries.filter(entry => new Date(entry.date) >= weekStart);
+    const monthEntries = db.timeEntries.filter(entry => new Date(entry.date) >= monthStart);
+    
+    const todayHours = todayEntries.reduce((sum, entry) => sum + entry.duration, 0);
+    const weekHours = weekEntries.reduce((sum, entry) => sum + entry.duration, 0);
+    const monthHours = monthEntries.reduce((sum, entry) => sum + entry.duration, 0);
+    
+    const billableEntries = db.timeEntries.filter(entry => entry.billable && entry.status === 'approved');
+    const totalEarnings = billableEntries.reduce((sum, entry) => {
+      // For now, use a default rate since hourlyRate isn't in Project interface
+      const rate = 100; // TODO: Add hourlyRate to Project interface
+      return sum + (entry.duration * rate);
+    }, 0);
+
+    return {
+      todayHours,
+      weekHours,
+      monthHours,
+      billableHours: billableEntries.reduce((sum, entry) => sum + entry.duration, 0),
+      nonBillableHours: db.timeEntries.filter(entry => !entry.billable).reduce((sum, entry) => sum + entry.duration, 0),
+      pendingEntries: db.timeEntries.filter(entry => entry.status === 'pending').length,
+      totalClients: db.clients.length,
+      activeProjects: db.projects.filter(p => p.active).length,
+      totalEarnings,
+      utilizationRate: weekHours > 0 ? (billableEntries.filter(entry => weekEntries.includes(entry)).reduce((sum, entry) => sum + entry.duration, 0) / weekHours) * 100 : 0,
+      automatedEntries: monthEntries.filter(entry => entry.automated).length
+    };
+  }, [db.timeEntries, db.projects, db.clients]);
+
   return {
     // Data - convert UserSettings to Settings for backward compatibility
     timeEntries: db.timeEntries,
     projects: db.projects,
     clients: db.clients,
     settings: convertToLegacySettings(db.settings),
+    stats,
     isLoading: db.isLoading,
     error: db.error,
 

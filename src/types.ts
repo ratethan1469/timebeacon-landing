@@ -134,4 +134,4 @@ export interface UserSettings {
   }>;
 }
 
-export type NavigationItem = 'dashboard' | 'entries' | 'reports' | 'ai-insights' | 'integrations' | 'settings' | 'privacy';
+export type NavigationItem = 'dashboard' | 'calendar' | 'reports' | 'ai-insights' | 'integrations' | 'settings' | 'privacy';

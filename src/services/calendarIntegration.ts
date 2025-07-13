@@ -160,7 +160,19 @@ class CalendarIntegrationService {
       }
 
       // Get authenticated calendar client
-      const calendar = googleCalendarAuth.getCalendarClient();
+      let calendar;
+      try {
+        calendar = googleCalendarAuth.getCalendarClient();
+      } catch (error) {
+        console.warn('Calendar client not available:', error);
+        return [];
+      }
+      
+      // Check if calendar client is available
+      if (!calendar) {
+        console.warn('Calendar client not available');
+        return [];
+      }
       
       // Fetch events from the last 24 hours
       const timeMin = new Date();
@@ -177,16 +189,21 @@ class CalendarIntegrationService {
         orderBy: 'startTime',
       });
 
+      if (!response || !response.data) {
+        console.warn('No response data from Google Calendar API');
+        return [];
+      }
+
       const events = response.data.items || [];
       
       // Convert Google Calendar events to our format
-      const calendarEvents: CalendarEvent[] = events.map(event => ({
+      const calendarEvents: CalendarEvent[] = events.map((event: any) => ({
         id: event.id || '',
         title: event.summary || 'Untitled Event',
         description: event.description || undefined,
         start: event.start?.dateTime || event.start?.date || new Date().toISOString(),
         end: event.end?.dateTime || event.end?.date || new Date().toISOString(),
-        attendees: event.attendees?.map(attendee => attendee.email || '') || [],
+        attendees: event.attendees?.map((attendee: any) => attendee.email || '') || [],
         location: event.location || undefined,
         organizer: event.organizer?.email || undefined,
         status: this.mapEventStatus(event.status || undefined),
@@ -194,7 +211,7 @@ class CalendarIntegrationService {
         recurrence: event.recurrence?.join(', ') || undefined,
         calendarId: 'primary',
         calendarName: 'Google Calendar'
-      })).filter(event => event.start && event.end);
+      })).filter((event: any) => event.start && event.end);
 
       console.log(`📅 Fetched ${calendarEvents.length} events from Google Calendar`);
       return calendarEvents;

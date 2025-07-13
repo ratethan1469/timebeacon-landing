@@ -101,8 +101,10 @@ class GoogleCalendarAuthService {
   /**
    * Get authenticated Google Calendar API client
    */
-  getCalendarClient() {
-    throw new Error('Google Calendar disabled in production');
+  getCalendarClient(): any | null {
+    // Google Calendar disabled in production for security
+    console.warn('Google Calendar disabled in production');
+    return null;
     // if (!this.isAuthenticated()) {
     //   throw new Error('Not authenticated with Google Calendar');
     // }
@@ -215,15 +217,6 @@ class GoogleCalendarAuthService {
     }
   }
 
-  /**
-   * Load stored authentication tokens
-   */
-  private loadStoredTokens(): void {
-    const tokens = this.getStoredTokens();
-    if (tokens) {
-      this.oauth2Client.setCredentials(tokens);
-    }
-  }
 
   /**
    * Get stored tokens

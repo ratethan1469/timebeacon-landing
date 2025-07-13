@@ -73,7 +73,7 @@ test.describe('TimeBeacon Application', () => {
     await page.fill('input[type="date"]', '2025-01-15');
     await page.fill('input[type="time"]', '09:00');
     await page.selectOption('select:has-text("15 minutes")', '1'); // 1 hour
-    await page.selectOption('select:has-text("Select Project")', { label: /Website Redesign|Mobile App Development|Internal Tools/ });
+    await page.selectOption('select:has-text("Select Project")', { label: 'Website Redesign' });
     await page.fill('textarea[placeholder="What did you work on?"]', 'Test time entry from E2E test');
     
     // Submit the form
@@ -106,7 +106,7 @@ test.describe('TimeBeacon Application', () => {
     
     if (entryCount > 0) {
       // Select an entry
-      await page.check('input[type="checkbox"]').first();
+      await page.check('input[type="checkbox"]');
       
       // Check if bulk actions appear
       await expect(page.locator('text=Bulk Actions')).toBeVisible();
@@ -155,7 +155,7 @@ test.describe('TimeBeacon Application', () => {
     
     // Check for notifications settings
     if (await page.locator('input[type="checkbox"]').count() > 0) {
-      await page.check('input[type="checkbox"]').first();
+      await page.check('input[type="checkbox"]');
     }
   });
 
