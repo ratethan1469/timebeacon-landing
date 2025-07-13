@@ -78,6 +78,23 @@ export const Dashboard: React.FC<DashboardProps> = ({
     description: '',
     billable: true
   });
+
+  // Memoize form update function to prevent unnecessary re-renders
+  const updateAddEntryForm = React.useCallback((updates: Partial<typeof addEntryForm>) => {
+    setAddEntryForm(prev => ({ ...prev, ...updates }));
+  }, []);
+
+  // Stable modal close handlers
+  const closeAddEntryModal = React.useCallback(() => {
+    setShowAddEntryModal(false);
+  }, []);
+
+  const closeDuplicateModal = React.useCallback(() => {
+    if (!isGenerating) {
+      setShowDuplicateModal(false);
+      setDuplicatingEntry(null);
+    }
+  }, [isGenerating]);
   
   // Calendar events integration
   const { getEventsForDate } = useCalendarEvents();
@@ -1006,13 +1023,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
       {/* Add Entry Modal */}
       {showAddEntryModal && (
-        <div className="modal-overlay" onClick={() => setShowAddEntryModal(false)}>
+        <div className="modal-overlay" onClick={closeAddEntryModal}>
           <div className="modal-content add-entry-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>✨ Create New Time Entry</h3>
               <button 
                 className="modal-close"
-                onClick={() => setShowAddEntryModal(false)}
+                onClick={closeAddEntryModal}
               >
                 ×
               </button>
@@ -1025,10 +1042,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     <span className="preview-icon">⏰</span>
                     <div>
                       <div className="preview-time">
-                        {new Date(addEntryForm.date).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })} • {addEntryForm.startTime} • {formatHours(addEntryForm.duration)}
+                        {addEntryForm.date ? new Date(addEntryForm.date).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }) : 'Select date'} • {addEntryForm.startTime} • {formatHours(addEntryForm.duration)}
                       </div>
                       <div className="preview-end-time">
-                        Ends at {calculateEndTime(addEntryForm.startTime, addEntryForm.duration)}
+                        Ends at {addEntryForm.startTime ? calculateEndTime(addEntryForm.startTime, addEntryForm.duration) : '--:--'}
                       </div>
                     </div>
                   </div>
@@ -1042,7 +1059,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       <input
                         type="date"
                         value={addEntryForm.date}
-                        onChange={(e) => setAddEntryForm({ ...addEntryForm, date: e.target.value })}
+                        onChange={(e) => updateAddEntryForm({ date: e.target.value })}
                         className="form-input enhanced-input"
                         required
                       />
@@ -1155,7 +1172,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   <button 
                     type="button" 
                     className="btn btn-secondary"
-                    onClick={() => setShowAddEntryModal(false)}
+                    onClick={closeAddEntryModal}
                   >
                     Cancel
                   </button>
@@ -1171,13 +1188,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
       {/* Duplicate Entry Modal */}
       {showDuplicateModal && duplicatingEntry && (
-        <div className="modal-overlay" onClick={() => !isGenerating && setShowDuplicateModal(false)}>
+        <div className="modal-overlay" onClick={closeDuplicateModal}>
           <div className="modal-content duplicate-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>🔄 Create Recurring Time Entries</h3>
               <button 
                 className="modal-close"
-                onClick={() => !isGenerating && setShowDuplicateModal(false)}
+                onClick={closeDuplicateModal}
                 disabled={isGenerating}
               >
                 ×
@@ -1274,7 +1291,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
             <div className="modal-footer">
               <button 
                 className="btn btn-secondary"
-                onClick={() => setShowDuplicateModal(false)}
+                onClick={closeDuplicateModal}
                 disabled={isGenerating}
               >
                 Cancel
