@@ -638,6 +638,23 @@ export const Dashboard: React.FC<DashboardProps> = ({
             {entries.filter(e => weekDates.includes(e.date) && e.automated).length}
           </div>
         </div>
+        <div className="summary-card status-summary-card">
+          <div className="summary-label">Entry Status</div>
+          <div className="status-breakdown">
+            <div className="status-item">
+              <div className="status-indicator approved"></div>
+              <span className="status-text">Approved: {entries.filter(e => weekDates.includes(e.date) && e.status === 'approved').length}</span>
+            </div>
+            <div className="status-item">
+              <div className="status-indicator pending"></div>
+              <span className="status-text">Pending: {entries.filter(e => weekDates.includes(e.date) && e.status === 'pending').length}</span>
+            </div>
+            <div className="status-item">
+              <div className="status-indicator submitted"></div>
+              <span className="status-text">Submitted: {entries.filter(e => weekDates.includes(e.date) && e.status === 'submitted').length}</span>
+            </div>
+          </div>
+        </div>
         <div className="submit-actions">
           {isCurrentWeek() ? (
             <div style={{ position: 'relative', display: 'inline-block' }}>

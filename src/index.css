@@ -1177,6 +1177,52 @@ input:checked + .toggle-slider:before {
   color: var(--text-primary);
 }
 
+.status-summary-card {
+  min-width: 200px;
+}
+
+.status-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-indicator.approved {
+  background: var(--success);
+}
+
+.status-indicator.pending {
+  background: var(--warning);
+}
+
+.status-indicator.submitted {
+  background: var(--info);
+}
+
+.status-indicator.rejected {
+  background: var(--error);
+}
+
+.status-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
 .submit-actions {
   display: flex;
   justify-content: center;
