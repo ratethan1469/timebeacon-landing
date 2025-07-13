@@ -465,67 +465,70 @@ export const Dashboard: React.FC<DashboardProps> = ({
   return (
     <div>
       <div className="dashboard-header">
-        <div>
-          <h1 className="dashboard-title">Dashboard</h1>
-          <p className="dashboard-subtitle">
-            Your weekly time tracking overview with smart automation
-          </p>
-        </div>
-        
-        {/* Top Line: Previous Week | Week Listed | Next Week */}
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center', 
-          gap: '16px', 
-          marginBottom: '16px',
-          width: '100%'
-        }}>
-          <button 
-            className="btn btn-secondary"
-            onClick={() => navigateWeek('prev')}
-          >
-            Previous Week
-          </button>
-          <span style={{ 
-            fontWeight: '600', 
-            fontSize: '16px', 
-            minWidth: '200px', 
-            textAlign: 'center' 
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%' }}>
+          <div>
+            <h1 className="dashboard-title">Dashboard</h1>
+            <p className="dashboard-subtitle">
+              Your weekly time tracking overview with smart automation
+            </p>
+          </div>
+          
+          {/* Top Right: Previous Week | Week Listed | Next Week */}
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column',
+            alignItems: 'flex-end',
+            gap: '12px'
           }}>
-            {weekRange}
-          </span>
-          <button 
-            className="btn btn-secondary"
-            onClick={() => navigateWeek('next')}
-          >
-            Next Week
-          </button>
-        </div>
-        
-        {/* Bottom Line: Add Entry and Current Week buttons */}
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center', 
-          gap: '12px',
-          marginTop: '8px',
-          width: '100%'
-        }}>
-          <button 
-            className="btn btn-primary"
-            onClick={() => setShowAddEntryModal(true)}
-          >
-            Add Entry
-          </button>
-          {!isCurrentWeek() && (
-            <button 
-              className="btn btn-secondary"
-              onClick={goToCurrentWeek}
-            >
-              Current Week
-            </button>
-          )}
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '16px'
+            }}>
+              <button 
+                className="btn btn-secondary"
+                onClick={() => navigateWeek('prev')}
+              >
+                Previous Week
+              </button>
+              <span style={{ 
+                fontWeight: '600', 
+                fontSize: '16px', 
+                minWidth: '200px', 
+                textAlign: 'center' 
+              }}>
+                {weekRange}
+              </span>
+              <button 
+                className="btn btn-secondary"
+                onClick={() => navigateWeek('next')}
+              >
+                Next Week
+              </button>
+            </div>
+            
+            {/* Bottom Line: Add Entry and Current Week buttons */}
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '12px'
+            }}>
+              <button 
+                className="btn btn-primary"
+                onClick={() => setShowAddEntryModal(true)}
+              >
+                Add Entry
+              </button>
+              {!isCurrentWeek() && (
+                <button 
+                  className="btn btn-secondary"
+                  onClick={goToCurrentWeek}
+                >
+                  Current Week
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
