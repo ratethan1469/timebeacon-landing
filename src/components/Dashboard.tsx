@@ -61,6 +61,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const [newDuration, setNewDuration] = useState(0);
   const [showAddEntryModal, setShowAddEntryModal] = useState(false);
   const [selectedEntries, setSelectedEntries] = useState<Set<string>>(new Set());
+  const [showDuplicateModal, setShowDuplicateModal] = useState(false);
+  const [duplicatingEntry, setDuplicatingEntry] = useState<TimeEntry | null>(null);
+  const [duplicateSettings, setDuplicateSettings] = useState({
+    frequency: 'weekly' as 'weekly' | 'daily' | 'monthly',
+    count: 4,
+    skipWeekends: true
+  });
   const [addEntryForm, setAddEntryForm] = useState({
     date: new Date().toISOString().split('T')[0],
     startTime: '09:00',
@@ -264,6 +271,62 @@ export const Dashboard: React.FC<DashboardProps> = ({
       onUpdateEntry(entryId, { status: newStatus });
     });
     setSelectedEntries(new Set());
+  };
+
+  const handleDuplicate = (entry: TimeEntry) => {
+    setDuplicatingEntry(entry);
+    setDuplicateSettings({
+      frequency: 'weekly',
+      count: 4,
+      skipWeekends: true
+    });
+    setShowDuplicateModal(true);
+  };
+
+  const generateDuplicates = () => {
+    if (!duplicatingEntry || !onAddEntry) return;
+
+    const duplicates: Omit<TimeEntry, 'id'>[] = [];
+    const startDate = new Date(duplicatingEntry.date);
+    
+    for (let i = 1; i <= duplicateSettings.count; i++) {
+      const newDate = new Date(startDate);
+      
+      switch (duplicateSettings.frequency) {
+        case 'daily':
+          newDate.setDate(startDate.getDate() + i);
+          break;
+        case 'weekly':
+          newDate.setDate(startDate.getDate() + (i * 7));
+          break;
+        case 'monthly':
+          newDate.setMonth(startDate.getMonth() + i);
+          break;
+      }
+
+      // Skip weekends if option is enabled
+      if (duplicateSettings.skipWeekends) {
+        const dayOfWeek = newDate.getDay();
+        if (dayOfWeek === 0 || dayOfWeek === 6) {
+          // Skip this iteration for weekends
+          continue;
+        }
+      }
+
+      duplicates.push({
+        ...duplicatingEntry,
+        date: newDate.toISOString().split('T')[0],
+        status: 'pending' // Reset status for duplicates
+      });
+    }
+
+    // Create all duplicate entries
+    duplicates.forEach(duplicate => {
+      onAddEntry(duplicate);
+    });
+
+    setShowDuplicateModal(false);
+    setDuplicatingEntry(null);
   };
 
   const convertCalendarEventToTimeEntry = (event: CalendarEvent) => {
@@ -512,21 +575,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
             {getTotalHoursForWeek() > 0 ? ((entries.filter(e => weekDates.includes(e.date) && e.billable).reduce((sum, e) => sum + e.duration, 0) / getTotalHoursForWeek()) * 100).toFixed(1) : 0}%
           </div>
         </div>
-        <div className="summary-card submit-entries-card">
-          <button 
-            className="btn btn-primary submit-entries-btn"
-            onClick={() => {
-              // Submit all pending entries for approval
-              const pendingEntries = entries.filter(e => weekDates.includes(e.date) && e.status === 'pending');
-              pendingEntries.forEach(entry => {
-                onUpdateEntry(entry.id, { status: 'submitted' });
-              });
-            }}
-            disabled={getPendingEntriesCount() === 0}
-          >
-            📝 Submit Entries ({getPendingEntriesCount()})
-          </button>
-        </div>
         <div className="summary-card">
           <div className="summary-label">Automated Entries</div>
           <div className="summary-value">
@@ -701,6 +749,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
                             title="Edit duration"
                           >
                             ✏️
+                          </button>
+                          <button 
+                            className="btn btn-small btn-secondary"
+                            onClick={() => handleDuplicate(entry)}
+                            title="Duplicate for recurring meetings"
+                          >
+                            📋
                           </button>
                           <button 
                             className="btn btn-small btn-danger"
@@ -1002,6 +1057,86 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Duplicate Entry Modal */}
+      {showDuplicateModal && duplicatingEntry && (
+        <div className="modal-overlay" onClick={() => setShowDuplicateModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>📋 Duplicate Entry for Recurring Meetings</h3>
+              <button 
+                className="modal-close"
+                onClick={() => setShowDuplicateModal(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              {/* Entry Preview */}
+              <div style={{ background: 'var(--background-secondary)', padding: '16px', borderRadius: '8px', marginBottom: '24px' }}>
+                <h4 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px', color: 'var(--text-primary)' }}>
+                  {duplicatingEntry.project} • {duplicatingEntry.client}
+                </h4>
+                <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
+                  {new Date(duplicatingEntry.date).toLocaleDateString()} • {formatTimeRange(duplicatingEntry.startTime, duplicatingEntry.endTime)}
+                  <br />
+                  {duplicatingEntry.description}
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Frequency</label>
+                <select
+                  value={duplicateSettings.frequency}
+                  onChange={(e) => setDuplicateSettings({ ...duplicateSettings, frequency: e.target.value as 'weekly' | 'daily' | 'monthly' })}
+                  className="form-input"
+                >
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Number of occurrences</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="52"
+                  value={duplicateSettings.count}
+                  onChange={(e) => setDuplicateSettings({ ...duplicateSettings, count: parseInt(e.target.value) || 1 })}
+                  className="form-input"
+                />
+              </div>
+
+              <div className="form-group">
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input
+                    type="checkbox"
+                    checked={duplicateSettings.skipWeekends}
+                    onChange={(e) => setDuplicateSettings({ ...duplicateSettings, skipWeekends: e.target.checked })}
+                  />
+                  Skip weekends
+                </label>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button 
+                className="btn btn-secondary"
+                onClick={() => setShowDuplicateModal(false)}
+              >
+                Cancel
+              </button>
+              <button 
+                className="btn btn-primary"
+                onClick={generateDuplicates}
+              >
+                Create {duplicateSettings.count} Duplicates
+              </button>
             </div>
           </div>
         </div>
