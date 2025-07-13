@@ -25,7 +25,9 @@
       "Bash(npx vite build:*)",
       "Bash(kill:*)",
       "Bash(git tag:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": []
   }

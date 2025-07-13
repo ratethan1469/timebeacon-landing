@@ -390,13 +390,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </p>
         </div>
         
-        {/* Week Navigation - All on same line */}
+        {/* Top Line: Previous Week | Week Listed | Next Week */}
         <div className="week-navigation" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
           <button 
             className="btn btn-secondary"
             onClick={() => navigateWeek('prev')}
           >
-            ← Previous Week
+            Previous Week
           </button>
           <span className="week-range" style={{ fontWeight: '600', fontSize: '16px', minWidth: '200px', textAlign: 'center' }}>
             {weekRange}
@@ -405,24 +405,24 @@ export const Dashboard: React.FC<DashboardProps> = ({
             className="btn btn-secondary"
             onClick={() => navigateWeek('next')}
           >
-            Next Week →
+            Next Week
           </button>
         </div>
         
-        {/* Add Entry and Current Week buttons - Below navigation */}
+        {/* Bottom Line: Add Entry and Current Week buttons */}
         <div className="action-buttons" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px' }}>
           <button 
             className="btn btn-primary"
             onClick={() => setShowAddEntryModal(true)}
           >
-            ➕ Add Entry
+            Add Entry
           </button>
           {!isCurrentWeek() && (
             <button 
               className="btn btn-secondary"
               onClick={goToCurrentWeek}
             >
-              📅 Current Week
+              Current Week
             </button>
           )}
         </div>
