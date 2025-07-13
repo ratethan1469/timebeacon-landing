@@ -927,31 +927,77 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 </div>
 
                 {/* Quick Adjustment Buttons */}
-                <div style={{ 
-                  display: 'grid', 
-                  gridTemplateColumns: 'repeat(3, 1fr)', 
-                  gap: '8px', 
-                  marginBottom: '16px'
-                }}>
-                  <button 
-                    className="btn btn-secondary btn-small"
-                    onClick={() => adjustDuration(-0.25)}
-                    disabled={newDuration <= 0.25}
-                  >
-                    − 15min
-                  </button>
-                  <button 
-                    className="btn btn-secondary btn-small"
-                    onClick={() => adjustDuration(0.25)}
-                  >
-                    + 15min
-                  </button>
-                  <button 
-                    className="btn btn-secondary btn-small"
-                    onClick={() => adjustDuration(0.5)}
-                  >
-                    + 30min
-                  </button>
+                <div style={{ marginBottom: '20px' }}>
+                  {/* Subtract Buttons */}
+                  <div style={{ marginBottom: '12px' }}>
+                    <label style={{ fontSize: '14px', fontWeight: '600', marginBottom: '8px', display: 'block', textAlign: 'center' }}>
+                      Subtract Time
+                    </label>
+                    <div style={{ 
+                      display: 'grid', 
+                      gridTemplateColumns: 'repeat(3, 1fr)', 
+                      gap: '8px'
+                    }}>
+                      <button 
+                        className="btn btn-secondary btn-small"
+                        onClick={() => adjustDuration(-0.25)}
+                        disabled={newDuration <= 0.25}
+                        style={{ fontSize: '12px', padding: '8px 4px' }}
+                      >
+                        − 15min
+                      </button>
+                      <button 
+                        className="btn btn-secondary btn-small"
+                        onClick={() => adjustDuration(-0.5)}
+                        disabled={newDuration <= 0.5}
+                        style={{ fontSize: '12px', padding: '8px 4px' }}
+                      >
+                        − 30min
+                      </button>
+                      <button 
+                        className="btn btn-secondary btn-small"
+                        onClick={() => adjustDuration(-1)}
+                        disabled={newDuration <= 1}
+                        style={{ fontSize: '12px', padding: '8px 4px' }}
+                      >
+                        − 1hr
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* Add Buttons */}
+                  <div>
+                    <label style={{ fontSize: '14px', fontWeight: '600', marginBottom: '8px', display: 'block', textAlign: 'center' }}>
+                      Add Time
+                    </label>
+                    <div style={{ 
+                      display: 'grid', 
+                      gridTemplateColumns: 'repeat(3, 1fr)', 
+                      gap: '8px'
+                    }}>
+                      <button 
+                        className="btn btn-primary btn-small"
+                        onClick={() => adjustDuration(0.25)}
+                        style={{ fontSize: '12px', padding: '8px 4px' }}
+                      >
+                        + 15min
+                      </button>
+                      <button 
+                        className="btn btn-primary btn-small"
+                        onClick={() => adjustDuration(0.5)}
+                        style={{ fontSize: '12px', padding: '8px 4px' }}
+                      >
+                        + 30min
+                      </button>
+                      <button 
+                        className="btn btn-primary btn-small"
+                        onClick={() => adjustDuration(1)}
+                        style={{ fontSize: '12px', padding: '8px 4px' }}
+                      >
+                        + 1hr
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Precise Input */}
@@ -1006,12 +1052,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
       )}
 
-      {/* Add Entry Modal - Simplified */}
+      {/* Add Entry Modal - Sexy & Streamlined */}
       {showAddEntryModal && (
         <div className="modal-overlay" onClick={closeAddEntryModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>Add New Time Entry</h3>
+              <h3>⚡ Quick Time Entry</h3>
               <button 
                 className="modal-close"
                 onClick={closeAddEntryModal}
@@ -1021,104 +1067,188 @@ export const Dashboard: React.FC<DashboardProps> = ({
             </div>
             <div className="modal-body">
               <form onSubmit={handleAddEntrySubmit}>
-                <div className="form-group">
-                  <label>Date</label>
-                  <input
-                    type="date"
-                    value={addEntryForm.date}
-                    onChange={(e) => updateAddEntryForm({ date: e.target.value })}
-                    className="form-input"
-                    required
-                  />
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                  <div className="form-group">
-                    <label>Start Time</label>
-                    <input
-                      type="time"
-                      value={addEntryForm.startTime}
-                      onChange={(e) => setAddEntryForm({ ...addEntryForm, startTime: e.target.value })}
-                      className="form-input"
-                      required
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Duration (hours)</label>
-                    <input
-                      type="number"
-                      min="0.25"
-                      max="24"
-                      step="0.25"
-                      value={addEntryForm.duration}
-                      onChange={(e) => setAddEntryForm({ ...addEntryForm, duration: parseFloat(e.target.value) || 1 })}
-                      className="form-input"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label>Client</label>
-                  <select
-                    value={addEntryForm.client}
-                    onChange={(e) => setAddEntryForm({ ...addEntryForm, client: e.target.value, project: '' })}
-                    className="form-input"
-                    required
-                  >
-                    <option value="">Choose a client...</option>
-                    {clients.map(client => (
-                      <option key={client.id} value={client.name}>
-                        {client.name}
-                      </option>
+                {/* Quick Duration Selection */}
+                <div className="form-group" style={{ marginBottom: '24px' }}>
+                  <label style={{ fontSize: '16px', fontWeight: '600', marginBottom: '12px', display: 'block' }}>
+                    How long did you work?
+                  </label>
+                  <div style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: 'repeat(4, 1fr)', 
+                    gap: '8px',
+                    marginBottom: '16px'
+                  }}>
+                    {[0.5, 1, 2, 4].map(hours => (
+                      <button
+                        key={hours}
+                        type="button"
+                        className={`btn ${addEntryForm.duration === hours ? 'btn-primary' : 'btn-secondary'}`}
+                        onClick={() => setAddEntryForm({ ...addEntryForm, duration: hours })}
+                        style={{ 
+                          padding: '12px 8px',
+                          fontSize: '14px',
+                          fontWeight: '600'
+                        }}
+                      >
+                        {hours === 0.5 ? '30min' : `${hours}h`}
+                      </button>
                     ))}
-                  </select>
+                  </div>
+                  <div style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: 'repeat(3, 1fr)', 
+                    gap: '8px'
+                  }}>
+                    {[6, 8, 'custom'].map(option => (
+                      <button
+                        key={option}
+                        type="button"
+                        className={`btn ${
+                          option === 'custom' 
+                            ? (![0.5, 1, 2, 4, 6, 8].includes(addEntryForm.duration) ? 'btn-primary' : 'btn-secondary')
+                            : (addEntryForm.duration === option ? 'btn-primary' : 'btn-secondary')
+                        }`}
+                        onClick={() => {
+                          if (option === 'custom') {
+                            const customDuration = prompt('Enter duration in hours (e.g., 1.5):');
+                            if (customDuration && !isNaN(parseFloat(customDuration))) {
+                              setAddEntryForm({ ...addEntryForm, duration: parseFloat(customDuration) });
+                            }
+                          } else {
+                            setAddEntryForm({ ...addEntryForm, duration: option as number });
+                          }
+                        }}
+                        style={{ 
+                          padding: '12px 8px',
+                          fontSize: '14px',
+                          fontWeight: '600'
+                        }}
+                      >
+                        {option === 'custom' ? 'Other' : `${option}h`}
+                      </button>
+                    ))}
+                  </div>
+                  {![0.5, 1, 2, 4, 6, 8].includes(addEntryForm.duration) && (
+                    <div style={{ 
+                      marginTop: '12px', 
+                      padding: '8px 12px', 
+                      background: 'var(--brand-primary-light)', 
+                      borderRadius: '6px',
+                      textAlign: 'center',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      color: 'var(--brand-primary)'
+                    }}>
+                      {addEntryForm.duration}h selected
+                    </div>
+                  )}
                 </div>
 
-                <div className="form-group">
-                  <label>Project</label>
-                  <select
-                    value={addEntryForm.project}
-                    onChange={(e) => setAddEntryForm({ ...addEntryForm, project: e.target.value })}
-                    className="form-input"
-                    required
-                    disabled={!addEntryForm.client}
-                  >
-                    <option value="">
-                      {addEntryForm.client ? 'Choose a project...' : 'Select client first'}
-                    </option>
-                    {projects
-                      .filter(p => p.active && p.client === addEntryForm.client)
-                      .map(project => (
-                        <option key={project.id} value={project.name}>
-                          {project.name}
+                {/* Simplified Client/Project Selection */}
+                <div className="form-group" style={{ marginBottom: '20px' }}>
+                  <label style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px', display: 'block' }}>
+                    Client & Project
+                  </label>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <select
+                      value={addEntryForm.client}
+                      onChange={(e) => setAddEntryForm({ ...addEntryForm, client: e.target.value, project: '' })}
+                      className="form-input"
+                      required
+                      style={{ fontSize: '14px' }}
+                    >
+                      <option value="">Client...</option>
+                      {clients.map(client => (
+                        <option key={client.id} value={client.name}>
+                          {client.name}
                         </option>
                       ))}
-                  </select>
+                    </select>
+                    <select
+                      value={addEntryForm.project}
+                      onChange={(e) => setAddEntryForm({ ...addEntryForm, project: e.target.value })}
+                      className="form-input"
+                      required
+                      disabled={!addEntryForm.client}
+                      style={{ fontSize: '14px' }}
+                    >
+                      <option value="">
+                        {addEntryForm.client ? 'Project...' : 'Select client first'}
+                      </option>
+                      {projects
+                        .filter(p => p.active && p.client === addEntryForm.client)
+                        .map(project => (
+                          <option key={project.id} value={project.name}>
+                            {project.name}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
                 </div>
 
-                <div className="form-group">
-                  <label>Description</label>
+                {/* Quick Description */}
+                <div className="form-group" style={{ marginBottom: '20px' }}>
+                  <label style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px', display: 'block' }}>
+                    What did you work on?
+                  </label>
                   <textarea
                     value={addEntryForm.description}
                     onChange={(e) => setAddEntryForm({ ...addEntryForm, description: e.target.value })}
                     className="form-input"
-                    rows={3}
-                    placeholder="Describe the work you completed..."
+                    rows={2}
+                    placeholder="Brief description of work completed..."
                     required
+                    style={{ fontSize: '14px' }}
                   />
                 </div>
 
-                <div className="form-group">
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <input
-                      type="checkbox"
-                      checked={addEntryForm.billable}
-                      onChange={(e) => setAddEntryForm({ ...addEntryForm, billable: e.target.checked })}
-                    />
-                    Billable
-                  </label>
-                </div>
+                {/* Advanced Options Toggle */}
+                <details style={{ marginBottom: '20px' }}>
+                  <summary style={{ 
+                    cursor: 'pointer', 
+                    fontSize: '14px', 
+                    color: 'var(--text-secondary)',
+                    marginBottom: '12px'
+                  }}>
+                    ⚙️ Advanced Options
+                  </summary>
+                  <div style={{ padding: '12px', background: 'var(--background-secondary)', borderRadius: '8px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+                      <div className="form-group">
+                        <label style={{ fontSize: '14px', marginBottom: '4px', display: 'block' }}>Date</label>
+                        <input
+                          type="date"
+                          value={addEntryForm.date}
+                          onChange={(e) => updateAddEntryForm({ date: e.target.value })}
+                          className="form-input"
+                          required
+                          style={{ fontSize: '14px' }}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label style={{ fontSize: '14px', marginBottom: '4px', display: 'block' }}>Start Time</label>
+                        <input
+                          type="time"
+                          value={addEntryForm.startTime}
+                          onChange={(e) => setAddEntryForm({ ...addEntryForm, startTime: e.target.value })}
+                          className="form-input"
+                          required
+                          style={{ fontSize: '14px' }}
+                        />
+                      </div>
+                    </div>
+                    <div className="form-group">
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px' }}>
+                        <input
+                          type="checkbox"
+                          checked={addEntryForm.billable}
+                          onChange={(e) => setAddEntryForm({ ...addEntryForm, billable: e.target.checked })}
+                        />
+                        Billable to client
+                      </label>
+                    </div>
+                  </div>
+                </details>
 
                 <div className="modal-footer">
                   <button 
@@ -1128,8 +1258,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   >
                     Cancel
                   </button>
-                  <button type="submit" className="btn btn-primary">
-                    Create Entry
+                  <button type="submit" className="btn btn-primary" style={{ fontSize: '16px', padding: '12px 24px' }}>
+                    ✨ Create Entry
                   </button>
                 </div>
               </form>
