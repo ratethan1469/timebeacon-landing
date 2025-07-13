@@ -1851,7 +1851,7 @@ input:checked + .toggle-slider:before {
   height: auto;
 }
 
-/* Modal styles */
+/* Modal styles - Simplified for stability */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -1863,8 +1863,6 @@ input:checked + .toggle-slider:before {
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  animation: fadeIn 0.15s ease-out;
-  backdrop-filter: blur(2px);
 }
 
 .modal-content {
@@ -1875,24 +1873,12 @@ input:checked + .toggle-slider:before {
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-  animation: slideIn 0.2s ease-out;
-  will-change: transform, opacity;
-  transform: translateZ(0); /* Force hardware acceleration */
+  opacity: 1;
+  transform: none;
 }
 
 .duplicate-modal {
   max-width: 600px;
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
 }
 
 /* Duplicate Modal Specific Styles */
@@ -2009,8 +1995,7 @@ input:checked + .toggle-slider:before {
 }
 
 .date-item:hover {
-  transform: translateX(4px);
-  box-shadow: var(--shadow-sm);
+  background: var(--surface-hover);
 }
 
 .date-number {
@@ -2104,13 +2089,11 @@ input:checked + .toggle-slider:before {
   border-radius: 8px;
   padding: 12px 16px;
   font-size: 14px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  transform: translateZ(0); /* Force hardware acceleration */
 }
 
 .enhanced-input:focus {
   border-color: var(--brand-primary);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  outline: none;
 }
 
 .enhanced-input:disabled {
@@ -2153,7 +2136,6 @@ input:checked + .toggle-slider:before {
 .toggle-label:hover {
   background: var(--surface);
   border-color: var(--brand-primary);
-  transform: translateY(-1px);
 }
 
 .toggle-input {

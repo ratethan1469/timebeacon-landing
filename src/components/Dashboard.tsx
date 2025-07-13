@@ -59,6 +59,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const [editingEntry, setEditingEntry] = useState<TimeEntry | null>(null);
   const [showDurationModal, setShowDurationModal] = useState(false);
   const [newDuration, setNewDuration] = useState(0);
+  const [showDescriptionModal, setShowDescriptionModal] = useState(false);
+  const [newDescription, setNewDescription] = useState('');
   const [showAddEntryModal, setShowAddEntryModal] = useState(false);
   const [selectedEntries, setSelectedEntries] = useState<Set<string>>(new Set());
   const [showDuplicateModal, setShowDuplicateModal] = useState(false);
@@ -213,6 +215,21 @@ export const Dashboard: React.FC<DashboardProps> = ({
     setEditingEntry(entry);
     setNewDuration(entry.duration);
     setShowDurationModal(true);
+  };
+
+  const handleEditDescription = (entry: TimeEntry) => {
+    setEditingEntry(entry);
+    setNewDescription(entry.description);
+    setShowDescriptionModal(true);
+  };
+
+  const saveDescriptionChange = () => {
+    if (editingEntry && newDescription.trim()) {
+      onUpdateEntry(editingEntry.id, { description: newDescription.trim() });
+      setShowDescriptionModal(false);
+      setEditingEntry(null);
+      setNewDescription('');
+    }
   };
 
   const calculateEndTime = (startTime: string, duration: number) => {
@@ -834,6 +851,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
                             onClick={() => handleEditDuration(entry)}
                             title="Edit duration"
                           >
+                            ⏱️
+                          </button>
+                          <button 
+                            className="btn btn-small btn-secondary"
+                            onClick={() => handleEditDescription(entry)}
+                            title="Edit description"
+                          >
                             ✏️
                           </button>
                           <button 
@@ -1021,6 +1045,63 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
       )}
 
+      {/* Description Edit Modal */}
+      {showDescriptionModal && editingEntry && (
+        <div className="modal-overlay" onClick={() => setShowDescriptionModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>✏️ Edit Description</h3>
+              <button 
+                className="modal-close"
+                onClick={() => setShowDescriptionModal(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              {/* Entry Preview */}
+              <div style={{ background: 'var(--background-secondary)', padding: '16px', borderRadius: '8px', marginBottom: '24px' }}>
+                <h4 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px', color: 'var(--text-primary)' }}>
+                  {editingEntry.project} • {editingEntry.client}
+                </h4>
+                <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
+                  {new Date(editingEntry.date).toLocaleDateString()} • {formatTimeRange(editingEntry.startTime, editingEntry.endTime)}
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label style={{ fontWeight: '600', marginBottom: '8px', display: 'block' }}>
+                  Description:
+                </label>
+                <textarea
+                  value={newDescription}
+                  onChange={(e) => setNewDescription(e.target.value)}
+                  className="form-input"
+                  rows={4}
+                  placeholder="Describe what you worked on..."
+                  style={{ width: '100%', resize: 'vertical' }}
+                />
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button 
+                className="btn btn-secondary"
+                onClick={() => setShowDescriptionModal(false)}
+              >
+                Cancel
+              </button>
+              <button 
+                className="btn btn-primary"
+                onClick={saveDescriptionChange}
+                disabled={!newDescription.trim()}
+              >
+                Save Description
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Add Entry Modal */}
       {showAddEntryModal && (
         <div className="modal-overlay" onClick={closeAddEntryModal}>
@@ -1036,20 +1117,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
             </div>
             <div className="modal-body">
               <form onSubmit={handleAddEntrySubmit} className="entry-form enhanced-form">
-                {/* Quick Info Preview */}
-                <div className="entry-preview">
-                  <div className="preview-header">
-                    <span className="preview-icon">⏰</span>
-                    <div>
-                      <div className="preview-time">
-                        {addEntryForm.date ? new Date(addEntryForm.date).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }) : 'Select date'} • {addEntryForm.startTime} • {formatHours(addEntryForm.duration)}
-                      </div>
-                      <div className="preview-end-time">
-                        Ends at {addEntryForm.startTime ? calculateEndTime(addEntryForm.startTime, addEntryForm.duration) : '--:--'}
-                      </div>
-                    </div>
-                  </div>
-                </div>
 
                 <div className="form-section">
                   <h4 className="section-title">📅 When & How Long</h4>
