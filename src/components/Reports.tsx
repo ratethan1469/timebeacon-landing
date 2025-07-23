@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { TimeEntry, Project, Client } from '../types';
+import { TimeEntry, Project } from '../types';
 import { MultiSelect } from './MultiSelect';
 
 interface ReportsProps {
   entries: TimeEntry[];
   projects: Project[];
-  clients: Client[];
 }
 
 interface SavedReport {
@@ -14,21 +13,20 @@ interface SavedReport {
   reportTypes: ReportType[];
   dateRange: { start: string; end: string };
   selectedProjects: string[];
-  selectedClients: string[];
   chartTypes: ('donut' | 'bar' | 'line')[];
   createdAt: string;
 }
 
-type ReportType = 'utilization' | 'productivity' | 'client-breakdown' | 'project-breakdown' | 'time-distribution' | 'meeting-analysis';
+type ReportType = 'utilization' | 'productivity' | 'project-breakdown' | 'time-distribution' | 'meeting-analysis';
 
-// Helper function to get current week dates (Sunday to Saturday)
+// Helper function to get current week dates (Monday to Friday)
 const getCurrentWeekRange = () => {
   const today = new Date();
   const dayOfWeek = today.getDay();
   const startOfWeek = new Date(today);
-  startOfWeek.setDate(today.getDate() - dayOfWeek); // Go to Sunday
+  startOfWeek.setDate(today.getDate() - dayOfWeek + 1); // Go to Monday
   const endOfWeek = new Date(startOfWeek);
-  endOfWeek.setDate(startOfWeek.getDate() + 6); // Go to Saturday
+  endOfWeek.setDate(startOfWeek.getDate() + 4); // Go to Friday
   
   return {
     start: startOfWeek.toISOString().split('T')[0],
@@ -36,11 +34,10 @@ const getCurrentWeekRange = () => {
   };
 };
 
-export const Reports: React.FC<ReportsProps> = ({ entries, projects, clients }) => {
+export const Reports: React.FC<ReportsProps> = ({ entries, projects }) => {
   const [dateRange, setDateRange] = useState(getCurrentWeekRange());
   
   const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
-  const [selectedClients, setSelectedClients] = useState<string[]>([]);
   const [selectedChartTypes, setSelectedChartTypes] = useState<('donut' | 'bar' | 'line')[]>(['donut']);
   const [selectedReportTypes, setSelectedReportTypes] = useState<ReportType[]>(['utilization', 'client-breakdown']);
   const [savedReports, setSavedReports] = useState<SavedReport[]>([]);
@@ -203,17 +200,17 @@ export const Reports: React.FC<ReportsProps> = ({ entries, projects, clients }) 
     return acc;
   }, {} as Record<string, { hours: number; count: number; earnings: number }>);
 
-  const clientStats = filteredEntries.reduce((acc, entry) => {
-    if (!acc[entry.client]) {
-      acc[entry.client] = { hours: 0, count: 0, earnings: 0 };
+  const projectBreakdownStats = filteredEntries.reduce((acc, entry) => {
+    if (!acc[entry.project]) {
+      acc[entry.project] = { hours: 0, count: 0, earnings: 0 };
     }
     const project = projects.find(p => p.name === entry.project);
     const rate = entry.rate || project?.rate || 0;
     
-    acc[entry.client].hours += entry.duration;
-    acc[entry.client].count += 1;
+    acc[entry.project].hours += entry.duration;
+    acc[entry.project].count += 1;
     if (entry.status === 'approved') {
-      acc[entry.client].earnings += entry.duration * rate;
+      acc[entry.project].earnings += entry.duration * rate;
     }
     return acc;
   }, {} as Record<string, { hours: number; count: number; earnings: number }>);
@@ -258,7 +255,6 @@ export const Reports: React.FC<ReportsProps> = ({ entries, projects, clients }) 
       reportTypes: selectedReportTypes,
       dateRange,
       selectedProjects,
-      selectedClients,
       chartTypes: selectedChartTypes,
       createdAt: new Date().toISOString()
     };
@@ -272,7 +268,6 @@ export const Reports: React.FC<ReportsProps> = ({ entries, projects, clients }) 
     setSelectedReportTypes(report.reportTypes);
     setDateRange(report.dateRange);
     setSelectedProjects(report.selectedProjects);
-    setSelectedClients(report.selectedClients);
     setSelectedChartTypes(report.chartTypes);
   };
 
@@ -284,7 +279,6 @@ export const Reports: React.FC<ReportsProps> = ({ entries, projects, clients }) 
   const reportTypeOptions = [
     { value: 'utilization', label: 'Utilization Analysis' },
     { value: 'productivity', label: 'Productivity Metrics' },
-    { value: 'client-breakdown', label: 'Client Breakdown' },
     { value: 'project-breakdown', label: 'Project Breakdown' },
     { value: 'time-distribution', label: 'Time Distribution' },
     { value: 'meeting-analysis', label: 'Meeting Analysis' }
@@ -622,8 +616,8 @@ export const Reports: React.FC<ReportsProps> = ({ entries, projects, clients }) 
                 {[
                   { key: 'today', label: 'Today' },
                   { key: 'yesterday', label: 'Yesterday' },
-                  { key: 'thisWeek', label: 'This Week (Sun-Sat)' },
-                  { key: 'lastWeek', label: 'Last Week (Sun-Sat)' },
+                  { key: 'thisWeek', label: 'This Week (Mon-Fri)' },
+                  { key: 'lastWeek', label: 'Last Week (Mon-Fri)' },
                   { key: 'thisMonth', label: `This Month (${new Date().toLocaleDateString('en-US', { month: 'short' })})` },
                   { key: 'lastMonth', label: `Last Month (${new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1).toLocaleDateString('en-US', { month: 'short' })})` }
                 ].map(preset => (
@@ -776,14 +770,12 @@ export const Reports: React.FC<ReportsProps> = ({ entries, projects, clients }) 
       <div className="charts-grid">
         {selectedChartTypes.includes('donut') && (
           <>
-            <DonutChart data={clientStats} title="Hours by Client (Donut)" />
             <DonutChart data={projectStats} title="Hours by Project (Donut)" />
           </>
         )}
         
         {selectedChartTypes.includes('bar') && (
           <>
-            <BarChart data={clientStats} title="Hours by Client (Bar)" />
             <BarChart data={projectStats} title="Hours by Project (Bar)" />
           </>
         )}
@@ -799,25 +791,25 @@ export const Reports: React.FC<ReportsProps> = ({ entries, projects, clients }) 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px', marginTop: '32px' }}>
         <div className="content-card">
           <div className="card-header">
-            <h2 className="card-title">Top Clients</h2>
+            <h2 className="card-title">Top Projects</h2>
           </div>
           <div className="table-container">
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>Client</th>
+                  <th>Project</th>
                   <th>Hours</th>
                   <th>Entries</th>
                   <th>% of Total</th>
                 </tr>
               </thead>
               <tbody>
-                {Object.entries(clientStats)
+                {Object.entries(projectBreakdownStats)
                   .sort(([,a], [,b]) => b.hours - a.hours)
                   .slice(0, 10)
-                  .map(([client, stats]) => (
-                    <tr key={client}>
-                      <td>{client}</td>
+                  .map(([project, stats]) => (
+                    <tr key={project}>
+                      <td>{project}</td>
                       <td className="time-value">{formatHours(stats.hours)}</td>
                       <td>{stats.count}</td>
                       <td>{((stats.hours / totalHours) * 100).toFixed(1)}%</td>

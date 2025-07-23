@@ -1,12 +1,17 @@
 export const formatDateWithDay = (dateString: string) => {
   const date = new Date(dateString);
-  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  const dayName = dayNames[date.getDay()];
+  const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+  const dayOfWeek = date.getDay(); // 0=Sunday, 1=Monday, etc.
+  const dayName = dayOfWeek === 0 || dayOfWeek === 6 ? null : dayNames[dayOfWeek - 1];
   const formattedDate = date.toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
     year: 'numeric'
   });
+  
+  if (!dayName) {
+    return null; // Weekend day
+  }
   
   return {
     dayName,

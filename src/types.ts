@@ -17,20 +17,6 @@ export interface TimeEntry {
   rate?: number;
 }
 
-export interface Client {
-  id: string;
-  name: string;
-  industry?: string;
-  tier?: 'enterprise' | 'mid-market' | 'smb';
-  color: string;
-  defaultRate?: number;
-  active: boolean;
-  csm?: string;
-  implementationManager?: string;
-  accountValue?: number;
-  contactEmail?: string;
-  createdAt: string;
-}
 
 export interface Project {
   id: string;
@@ -57,7 +43,6 @@ export interface DashboardStats {
   billableHours: number;
   nonBillableHours: number;
   pendingEntries: number;
-  totalClients: number;
   activeProjects: number;
   totalEarnings: number;
   utilizationRate: number;
@@ -66,7 +51,6 @@ export interface DashboardStats {
 
 export interface ActiveTimer {
   id: string;
-  client: string;
   project: string;
   description: string;
   startTime: string;
@@ -83,7 +67,6 @@ export interface Integration {
 }
 
 export interface Settings {
-  defaultClients: string[];
   defaultProjects: string[];
   workingHours: {
     start: string;
@@ -97,6 +80,13 @@ export interface Settings {
   notifications: boolean;
   autoBreaks: boolean;
   theme: 'light' | 'dark' | 'system';
+  profile?: {
+    name?: string;
+    email?: string;
+    company?: string;
+    jobTitle?: string;
+    phone?: string;
+  };
   emailNotifications: {
     enabled: boolean;
     dailyReviewTime: string; // HH:MM format

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TimeEntry, Project, Client } from '../types';
+import { TimeEntry, Project } from '../types';
 import { formatTimeRange } from '../utils/dateUtils';
 import { useCalendarEvents } from '../hooks/useCalendarEvents';
 import { CalendarEvent } from '../services/calendarIntegration';
@@ -7,25 +7,25 @@ import { CalendarEvent } from '../services/calendarIntegration';
 interface DashboardProps {
   entries: TimeEntry[];
   projects: Project[];
-  clients: Client[];
   onUpdateEntry: (id: string, updates: Partial<TimeEntry>) => void;
   onDeleteEntry: (id: string) => void;
   onAddEntry?: (entry: Omit<TimeEntry, 'id'>) => void;
 }
 
 const getDayOfWeek = (date: string) => {
-  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  return dayNames[new Date(date).getDay()];
+  const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+  const dayOfWeek = new Date(date).getDay();
+  return dayOfWeek === 0 || dayOfWeek === 6 ? null : dayNames[dayOfWeek - 1];
 };
 
 const getWeekDates = (currentDate: Date) => {
   const week = [];
   const startOfWeek = new Date(currentDate);
   const dayOfWeek = startOfWeek.getDay();
-  const diff = startOfWeek.getDate() - dayOfWeek; // Sunday start (American format)
+  const diff = startOfWeek.getDate() - dayOfWeek + 1; // Monday start
   startOfWeek.setDate(diff);
 
-  for (let i = 0; i < 7; i++) {
+  for (let i = 0; i < 5; i++) {
     const date = new Date(startOfWeek);
     date.setDate(startOfWeek.getDate() + i);
     week.push(date.toISOString().split('T')[0]);
@@ -50,7 +50,6 @@ const formatDate = (dateString: string) => {
 export const Dashboard: React.FC<DashboardProps> = ({
   entries,
   projects,
-  clients,
   onUpdateEntry,
   onDeleteEntry,
   onAddEntry
@@ -67,7 +66,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const [duplicateSettings, setDuplicateSettings] = useState({
     frequency: 'weekly' as 'weekly' | 'daily' | 'monthly',
     count: 4,
-    skipWeekends: true
+    skipWeekends: false
   });
   const [isGenerating, setIsGenerating] = useState(false);
   const [addEntryForm, setAddEntryForm] = useState({
@@ -77,7 +76,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
     client: '',
     project: '',
     description: '',
-    billable: true
+    billable: true,
+    createSeries: false,
+    frequency: 'weekly' as 'daily' | 'weekly' | 'monthly',
+    repeatCount: 4,
+    skipWeekends: false
   });
 
   // Memoize form update function to prevent unnecessary re-renders
@@ -246,25 +249,89 @@ export const Dashboard: React.FC<DashboardProps> = ({
     setNewDuration(Math.round(adjusted * 4) / 4); // Round to nearest 15-minute increment
   };
 
+  const generateRecurringEntries = (baseEntry: Omit<TimeEntry, 'id'>, settings: {
+    frequency: 'daily' | 'weekly' | 'monthly';
+    count: number;
+    skipWeekends: boolean;
+  }) => {
+    const entries: Omit<TimeEntry, 'id'>[] = [];
+    const startDate = new Date(baseEntry.date);
+    
+    for (let i = 0; i < settings.count; i++) {
+      const currentDate = new Date(startDate);
+      
+      // Calculate date based on frequency
+      switch (settings.frequency) {
+        case 'daily':
+          currentDate.setDate(startDate.getDate() + i);
+          break;
+        case 'weekly':
+          currentDate.setDate(startDate.getDate() + (i * 7));
+          break;
+        case 'monthly':
+          currentDate.setMonth(startDate.getMonth() + i);
+          break;
+      }
+      
+      // Skip weekends if enabled
+      if (settings.skipWeekends && (currentDate.getDay() === 0 || currentDate.getDay() === 6)) {
+        // Move to next Monday for weekend dates
+        const daysToAdd = currentDate.getDay() === 0 ? 1 : 2;
+        currentDate.setDate(currentDate.getDate() + daysToAdd);
+      }
+      
+      entries.push({
+        ...baseEntry,
+        date: currentDate.toISOString().split('T')[0]
+      });
+    }
+    
+    return entries;
+  };
+
   const handleAddEntrySubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!onAddEntry) return;
 
     const endTime = calculateEndTime(addEntryForm.startTime, addEntryForm.duration);
     
-    onAddEntry({
-      date: addEntryForm.date,
-      startTime: addEntryForm.startTime,
-      endTime,
-      duration: addEntryForm.duration,
-      client: addEntryForm.client,
-      project: addEntryForm.project,
-      description: addEntryForm.description,
-      category: 'client',
-      status: 'pending',
-      automated: false,
-      billable: addEntryForm.billable
-    });
+    if (addEntryForm.createSeries) {
+      // Create recurring entries
+      const entries = generateRecurringEntries({
+        date: addEntryForm.date,
+        startTime: addEntryForm.startTime,
+        endTime,
+        duration: addEntryForm.duration,
+        client: addEntryForm.client,
+        project: addEntryForm.project,
+        description: addEntryForm.description,
+        category: 'client',
+        status: 'pending',
+        automated: false,
+        billable: addEntryForm.billable
+      }, {
+        frequency: addEntryForm.frequency,
+        count: addEntryForm.repeatCount,
+        skipWeekends: addEntryForm.skipWeekends
+      });
+
+      entries.forEach(entry => onAddEntry(entry));
+    } else {
+      // Create single entry
+      onAddEntry({
+        date: addEntryForm.date,
+        startTime: addEntryForm.startTime,
+        endTime,
+        duration: addEntryForm.duration,
+        client: addEntryForm.client,
+        project: addEntryForm.project,
+        description: addEntryForm.description,
+        category: 'client',
+        status: 'pending',
+        automated: false,
+        billable: addEntryForm.billable
+      });
+    }
 
     // Reset form and close modal
     setAddEntryForm({
@@ -274,7 +341,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
       client: '',
       project: '',
       description: '',
-      billable: true
+      billable: true,
+      createSeries: false,
+      frequency: 'weekly' as 'daily' | 'weekly' | 'monthly',
+      repeatCount: 4,
+      skipWeekends: false
     });
     setShowAddEntryModal(false);
   };
@@ -302,7 +373,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
     setDuplicateSettings({
       frequency: 'weekly',
       count: 4,
-      skipWeekends: true
+      skipWeekends: false
     });
     setShowDuplicateModal(true);
   };
@@ -444,21 +515,15 @@ export const Dashboard: React.FC<DashboardProps> = ({
     // Try to extract client/project from event title
     const title = event.title.toLowerCase();
     
-    // Look for existing clients in the title
-    const matchedClient = clients.find(client => 
-      title.includes(client.name.toLowerCase())
+    // Look for existing projects in the title
+    const matchedProject = projects.find(project => 
+      title.includes(project.name.toLowerCase())
     );
     
-    if (matchedClient) {
-      // Look for existing projects for this client
-      const clientProjects = projects.filter(p => p.client === matchedClient.name);
-      const matchedProject = clientProjects.find(project => 
-        title.includes(project.name.toLowerCase())
-      );
-      
+    if (matchedProject) {
       return {
-        client: matchedClient.name,
-        project: matchedProject?.name || 'General Meeting'
+        client: '',
+        project: matchedProject.name
       };
     }
     
@@ -467,22 +532,18 @@ export const Dashboard: React.FC<DashboardProps> = ({
       for (const attendee of event.attendees) {
         const domain = attendee.split('@')[1];
         if (domain) {
-          const domainClient = clients.find(client => 
-            client.name.toLowerCase().includes(domain.split('.')[0])
-          );
-          if (domainClient) {
-            return {
-              client: domainClient.name,
-              project: 'General Meeting'
-            };
-          }
+          const companyName = domain.split('.')[0];
+          return {
+            client: '',
+            project: `${companyName.charAt(0).toUpperCase() + companyName.slice(1)} - Meeting`
+          };
         }
       }
     }
     
     // Default fallback
     return {
-      client: 'External',
+      client: '',
       project: 'Calendar Meeting'
     };
   };
@@ -775,7 +836,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 ) : (
                   dayEntries.map(entry => {
                     const project = projects.find(p => p.name === entry.project);
-                    const client = clients.find(c => c.name === entry.client);
                     
                     return (
                       <div key={entry.id} className="time-entry-card">
@@ -800,7 +860,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                           <div className="entry-client">
                             <div 
                               className="client-dot"
-                              style={{ backgroundColor: client?.color || project?.color || '#gray' }}
+                              style={{ backgroundColor: project?.color || '#6366f1' }}
                             />
                             <span className="client-name">{entry.client}</span>
                           </div>
@@ -1147,42 +1207,54 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 {/* Simplified Client/Project Selection */}
                 <div className="form-group" style={{ marginBottom: '20px' }}>
                   <label style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px', display: 'block' }}>
-                    Client & Project
+                    Project
                   </label>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                    <select
-                      value={addEntryForm.client}
-                      onChange={(e) => setAddEntryForm({ ...addEntryForm, client: e.target.value, project: '' })}
-                      className="form-input"
-                      required
-                      style={{ fontSize: '14px' }}
-                    >
-                      <option value="">Client...</option>
-                      {clients.map(client => (
-                        <option key={client.id} value={client.name}>
-                          {client.name}
+                  <select
+                    value={addEntryForm.project}
+                    onChange={(e) => setAddEntryForm({ ...addEntryForm, project: e.target.value })}
+                    className="form-input"
+                    required
+                    style={{ fontSize: '14px' }}
+                  >
+                    <option value="">Select project...</option>
+                    {projects
+                      .filter(p => p.active)
+                      .map(project => (
+                        <option key={project.id} value={project.name}>
+                          {project.name}
                         </option>
                       ))}
-                    </select>
-                    <select
-                      value={addEntryForm.project}
-                      onChange={(e) => setAddEntryForm({ ...addEntryForm, project: e.target.value })}
-                      className="form-input"
-                      required
-                      disabled={!addEntryForm.client}
-                      style={{ fontSize: '14px' }}
-                    >
-                      <option value="">
-                        {addEntryForm.client ? 'Project...' : 'Select client first'}
-                      </option>
-                      {projects
-                        .filter(p => p.active && p.client === addEntryForm.client)
-                        .map(project => (
-                          <option key={project.id} value={project.name}>
-                            {project.name}
-                          </option>
-                        ))}
-                    </select>
+                  </select>
+                </div>
+
+                {/* Date and Time */}
+                <div className="form-group" style={{ marginBottom: '20px' }}>
+                  <label style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px', display: 'block' }}>
+                    When did this happen?
+                  </label>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <div>
+                      <label style={{ fontSize: '14px', marginBottom: '4px', display: 'block' }}>Date</label>
+                      <input
+                        type="date"
+                        value={addEntryForm.date}
+                        onChange={(e) => updateAddEntryForm({ date: e.target.value })}
+                        className="form-input"
+                        required
+                        style={{ fontSize: '14px' }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '14px', marginBottom: '4px', display: 'block' }}>Start Time</label>
+                      <input
+                        type="time"
+                        value={addEntryForm.startTime}
+                        onChange={(e) => setAddEntryForm({ ...addEntryForm, startTime: e.target.value })}
+                        className="form-input"
+                        required
+                        style={{ fontSize: '14px' }}
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -1202,6 +1274,76 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   />
                 </div>
 
+                {/* Duplication Settings */}
+                <div className="form-group" style={{ marginBottom: '20px' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '16px', fontWeight: '600', marginBottom: '12px' }}>
+                    <input
+                      type="checkbox"
+                      checked={addEntryForm.createSeries || false}
+                      onChange={(e) => setAddEntryForm({ ...addEntryForm, createSeries: e.target.checked })}
+                    />
+                    🔄 Create recurring entries
+                  </label>
+                  
+                  {addEntryForm.createSeries && (
+                    <div style={{ 
+                      padding: '16px', 
+                      background: 'var(--brand-primary-light)', 
+                      borderRadius: '8px',
+                      border: '1px solid var(--brand-primary)'
+                    }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+                        <div>
+                          <label style={{ fontSize: '14px', marginBottom: '4px', display: 'block' }}>Frequency</label>
+                          <select
+                            value={addEntryForm.frequency || 'weekly'}
+                            onChange={(e) => setAddEntryForm({ ...addEntryForm, frequency: e.target.value as 'daily' | 'weekly' | 'monthly' })}
+                            className="form-input"
+                            style={{ fontSize: '14px' }}
+                          >
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label style={{ fontSize: '14px', marginBottom: '4px', display: 'block' }}>Count</label>
+                          <input
+                            type="number"
+                            min="2"
+                            max="52"
+                            value={addEntryForm.repeatCount || 4}
+                            onChange={(e) => setAddEntryForm({ ...addEntryForm, repeatCount: parseInt(e.target.value) || 4 })}
+                            className="form-input"
+                            style={{ fontSize: '14px' }}
+                          />
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'end' }}>
+                          <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px' }}>
+                            <input
+                              type="checkbox"
+                              checked={addEntryForm.skipWeekends || true}
+                              onChange={(e) => setAddEntryForm({ ...addEntryForm, skipWeekends: e.target.checked })}
+                            />
+                            Skip weekends
+                          </label>
+                        </div>
+                      </div>
+                      <div style={{ 
+                        fontSize: '13px', 
+                        color: 'var(--brand-primary)', 
+                        fontWeight: '500',
+                        textAlign: 'center'
+                      }}>
+                        Will create {addEntryForm.repeatCount || 4} entries {
+                          addEntryForm.frequency === 'daily' ? 'daily' : 
+                          addEntryForm.frequency === 'weekly' ? 'weekly' : 'monthly'
+                        }{addEntryForm.skipWeekends ? ', skipping weekends' : ''}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 {/* Advanced Options Toggle */}
                 <details style={{ marginBottom: '20px' }}>
                   <summary style={{ 
@@ -1210,33 +1352,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     color: 'var(--text-secondary)',
                     marginBottom: '12px'
                   }}>
-                    ⚙️ Advanced Options
+                    ⚙️ Additional Options
                   </summary>
                   <div style={{ padding: '12px', background: 'var(--background-secondary)', borderRadius: '8px' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
-                      <div className="form-group">
-                        <label style={{ fontSize: '14px', marginBottom: '4px', display: 'block' }}>Date</label>
-                        <input
-                          type="date"
-                          value={addEntryForm.date}
-                          onChange={(e) => updateAddEntryForm({ date: e.target.value })}
-                          className="form-input"
-                          required
-                          style={{ fontSize: '14px' }}
-                        />
-                      </div>
-                      <div className="form-group">
-                        <label style={{ fontSize: '14px', marginBottom: '4px', display: 'block' }}>Start Time</label>
-                        <input
-                          type="time"
-                          value={addEntryForm.startTime}
-                          onChange={(e) => setAddEntryForm({ ...addEntryForm, startTime: e.target.value })}
-                          className="form-input"
-                          required
-                          style={{ fontSize: '14px' }}
-                        />
-                      </div>
-                    </div>
                     <div className="form-group">
                       <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px' }}>
                         <input

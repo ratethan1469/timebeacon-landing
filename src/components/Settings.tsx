@@ -1,30 +1,27 @@
 import React, { useState } from 'react';
-import { Settings as SettingsType, Project, Client } from '../types';
+import { Settings as SettingsType, Project } from '../types';
 import { MultiSelect } from './MultiSelect';
+import { projectTemplates, ProjectTemplate } from '../data/projectTemplates';
 
 interface SettingsProps {
   settings: SettingsType;
   projects: Project[];
-  clients: Client[];
   onUpdateSettings: (settings: SettingsType) => void;
   onAddProject: (project: Omit<Project, 'id' | 'createdAt'>) => Project;
   onUpdateProject: (id: string, updates: Partial<Project>) => void;
   onDeleteProject: (id: string) => void;
-  onAddClient: (client: Omit<Client, 'id' | 'createdAt'>) => Client;
-  onUpdateClient: (id: string, updates: Partial<Client>) => void;
-  onDeleteClient: (id: string) => void;
 }
 
 export const Settings: React.FC<SettingsProps> = ({
   settings,
   projects,
-  clients,
   onUpdateSettings,
   onAddProject,
   onUpdateProject,
   onDeleteProject,
 }) => {
   const [showProjectForm, setShowProjectForm] = useState(false);
+  const [showTemplates, setShowTemplates] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [projectForm, setProjectForm] = useState({
     name: '',
@@ -53,8 +50,7 @@ export const Settings: React.FC<SettingsProps> = ({
     email: ''
   };
 
-  // Ensure defaultClients and defaultProjects are arrays
-  const safeDefaultClients = Array.isArray(settings.defaultClients) ? settings.defaultClients : [];
+  // Ensure defaultProjects is an array
   const safeDefaultProjects = Array.isArray(settings.defaultProjects) ? settings.defaultProjects : [];
 
   const handleProjectSubmit = (e: React.FormEvent) => {
@@ -99,6 +95,24 @@ export const Settings: React.FC<SettingsProps> = ({
     setShowProjectForm(true);
   };
 
+  const handleUseTemplate = (template: ProjectTemplate) => {
+    setProjectForm({
+      name: template.name,
+      client: template.client,
+      description: template.description,
+      rate: template.estimatedRate,
+      color: template.color,
+      active: true,
+      billable: true,
+      clientId: '',
+      category: template.category,
+      status: 'planning',
+      startDate: new Date().toISOString().split('T')[0]
+    });
+    setShowTemplates(false);
+    setShowProjectForm(true);
+  };
+
   const exportToCSV = () => {
     // This would implement CSV export functionality
     alert('CSV export feature would be implemented here');
@@ -117,6 +131,79 @@ export const Settings: React.FC<SettingsProps> = ({
       </div>
 
       <div style={{ display: 'grid', gap: '24px' }}>
+        {/* Profile Settings */}
+        <div className="content-card">
+          <div className="card-header">
+            <h2 className="card-title">Profile Settings</h2>
+          </div>
+          <div style={{ padding: '24px' }}>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Full Name</label>
+                <input
+                  type="text"
+                  value={settings.profile?.name || ''}
+                  onChange={(e) => handleSettingsChange({ 
+                    profile: { ...settings.profile, name: e.target.value }
+                  })}
+                  className="form-input"
+                  placeholder="Enter your full name"
+                />
+              </div>
+              <div className="form-group">
+                <label>Email</label>
+                <input
+                  type="email"
+                  value={settings.profile?.email || ''}
+                  onChange={(e) => handleSettingsChange({ 
+                    profile: { ...settings.profile, email: e.target.value }
+                  })}
+                  className="form-input"
+                  placeholder="Enter your email address"
+                />
+              </div>
+            </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Company</label>
+                <input
+                  type="text"
+                  value={settings.profile?.company || ''}
+                  onChange={(e) => handleSettingsChange({ 
+                    profile: { ...settings.profile, company: e.target.value }
+                  })}
+                  className="form-input"
+                  placeholder="Enter your company name"
+                />
+              </div>
+              <div className="form-group">
+                <label>Job Title</label>
+                <input
+                  type="text"
+                  value={settings.profile?.jobTitle || ''}
+                  onChange={(e) => handleSettingsChange({ 
+                    profile: { ...settings.profile, jobTitle: e.target.value }
+                  })}
+                  className="form-input"
+                  placeholder="Enter your job title"
+                />
+              </div>
+            </div>
+            <div className="form-group">
+              <label>Phone</label>
+              <input
+                type="tel"
+                value={settings.profile?.phone || ''}
+                onChange={(e) => handleSettingsChange({ 
+                  profile: { ...settings.profile, phone: e.target.value }
+                })}
+                className="form-input"
+                placeholder="Enter your phone number"
+              />
+            </div>
+          </div>
+        </div>
+
         {/* General Settings */}
         <div className="content-card">
           <div className="card-header">
@@ -124,22 +211,6 @@ export const Settings: React.FC<SettingsProps> = ({
           </div>
           <div style={{ padding: '24px' }}>
             <div className="form-row">
-              <div className="form-group">
-                <label>Default Clients</label>
-                <MultiSelect
-                  options={clients.filter(c => c.active).map(client => ({
-                    value: client.name,
-                    label: client.name
-                  }))}
-                  selectedValues={safeDefaultClients}
-                  onChange={(values) => handleSettingsChange({ defaultClients: values })}
-                  placeholder="Select default clients..."
-                  className="form-input"
-                />
-                <small style={{ color: 'var(--gray-600)', fontSize: '12px' }}>
-                  Clients that will be pre-selected when creating new time entries
-                </small>
-              </div>
               <div className="form-group">
                 <label>Default Projects</label>
                 <MultiSelect
@@ -331,15 +402,109 @@ export const Settings: React.FC<SettingsProps> = ({
           <div className="card-header">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h2 className="card-title">Project Management</h2>
-              <button 
-                className="btn btn-primary"
-                onClick={() => setShowProjectForm(true)}
-              >
-                ➕ Add Project
-              </button>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button 
+                  className="btn btn-secondary"
+                  onClick={() => setShowTemplates(!showTemplates)}
+                >
+                  📋 Templates
+                </button>
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => setShowProjectForm(true)}
+                >
+                  ➕ Add Project
+                </button>
+              </div>
             </div>
           </div>
           <div style={{ padding: '24px' }}>
+            {showTemplates && (
+              <div style={{ 
+                marginBottom: '24px', 
+                padding: '20px', 
+                backgroundColor: 'var(--surface-hover)', 
+                borderRadius: '8px' 
+              }}>
+                <h3 style={{ marginBottom: '16px', fontSize: '16px', fontWeight: '600' }}>
+                  Project Templates
+                </h3>
+                <div style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+                  gap: '12px' 
+                }}>
+                  {projectTemplates.map((template) => (
+                    <div 
+                      key={template.id}
+                      style={{ 
+                        padding: '16px', 
+                        backgroundColor: 'var(--surface)', 
+                        borderRadius: '6px',
+                        border: '1px solid var(--border)',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                      }}
+                      className="template-card"
+                      onClick={() => handleUseTemplate(template)}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                        <div 
+                          style={{ 
+                            width: '12px', 
+                            height: '12px', 
+                            borderRadius: '50%', 
+                            backgroundColor: template.color 
+                          }}
+                        />
+                        <h4 style={{ fontSize: '14px', fontWeight: '600', margin: 0 }}>
+                          {template.name}
+                        </h4>
+                        <span style={{ 
+                          fontSize: '12px', 
+                          color: 'var(--text-tertiary)',
+                          backgroundColor: 'var(--surface-hover)',
+                          padding: '2px 6px',
+                          borderRadius: '4px'
+                        }}>
+                          {template.category}
+                        </span>
+                      </div>
+                      <p style={{ 
+                        fontSize: '12px', 
+                        color: 'var(--text-secondary)', 
+                        margin: '0 0 8px 0',
+                        lineHeight: '1.4'
+                      }}>
+                        {template.description}
+                      </p>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--brand-primary)' }}>
+                          ${template.estimatedRate}/hr
+                        </span>
+                        <div style={{ display: 'flex', gap: '4px' }}>
+                          {template.tags.slice(0, 2).map((tag) => (
+                            <span 
+                              key={tag}
+                              style={{ 
+                                fontSize: '10px', 
+                                backgroundColor: 'var(--brand-primary-light)',
+                                color: 'var(--brand-primary)',
+                                padding: '2px 4px',
+                                borderRadius: '3px'
+                              }}
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
             {showProjectForm && (
               <div style={{ 
                 marginBottom: '24px', 
@@ -364,19 +529,17 @@ export const Settings: React.FC<SettingsProps> = ({
                     </div>
                     <div className="form-group">
                       <label>Client</label>
-                      <select
-                        value={projectForm.clientId}
-                        onChange={(e) => setProjectForm({ ...projectForm, clientId: e.target.value })}
+                      <input
+                        type="text"
+                        value={projectForm.client}
+                        onChange={(e) => setProjectForm({ ...projectForm, client: e.target.value })}
                         className="form-input"
+                        placeholder="e.g., Acme Corp - CRM Implementation"
                         required
-                      >
-                        <option value="">Select a client...</option>
-                        {clients.filter(c => c.active).map(client => (
-                          <option key={client.id} value={client.id}>
-                            {client.name}
-                          </option>
-                        ))}
-                      </select>
+                      />
+                      <small style={{ color: 'var(--text-tertiary)', fontSize: '12px' }}>
+                        Format: Customer Name - Project Type
+                      </small>
                     </div>
                     <div className="form-group">
                       <label>Color</label>
@@ -390,6 +553,60 @@ export const Settings: React.FC<SettingsProps> = ({
                     </div>
                   </div>
                   
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Hourly Rate ($)</label>
+                      <input
+                        type="number"
+                        value={projectForm.rate}
+                        onChange={(e) => setProjectForm({ ...projectForm, rate: parseFloat(e.target.value) || 0 })}
+                        className="form-input"
+                        min="0"
+                        step="0.01"
+                        placeholder="150.00"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Category</label>
+                      <select
+                        value={projectForm.category}
+                        onChange={(e) => setProjectForm({ ...projectForm, category: e.target.value as Project['category'] })}
+                        className="form-input"
+                      >
+                        <option value="implementation">Implementation</option>
+                        <option value="ongoing-support">Ongoing Support</option>
+                        <option value="training">Training</option>
+                        <option value="consulting">Consulting</option>
+                        <option value="escalation">Escalation</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Status</label>
+                      <select
+                        value={projectForm.status}
+                        onChange={(e) => setProjectForm({ ...projectForm, status: e.target.value as Project['status'] })}
+                        className="form-input"
+                      >
+                        <option value="planning">Planning</option>
+                        <option value="active">Active</option>
+                        <option value="on-hold">On Hold</option>
+                        <option value="completed">Completed</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label>Start Date</label>
+                      <input
+                        type="date"
+                        value={projectForm.startDate}
+                        onChange={(e) => setProjectForm({ ...projectForm, startDate: e.target.value })}
+                        className="form-input"
+                      />
+                    </div>
+                  </div>
+                  
                   <div className="form-group">
                     <label>Description</label>
                     <textarea
@@ -397,7 +614,7 @@ export const Settings: React.FC<SettingsProps> = ({
                       onChange={(e) => setProjectForm({ ...projectForm, description: e.target.value })}
                       className="form-input"
                       rows={3}
-                      placeholder="Brief project description..."
+                      placeholder="Brief description of the project scope and objectives"
                     />
                   </div>
 

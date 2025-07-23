@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { NavigationItem } from '../types';
 import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthContext';
 
 interface SidebarProps {
   activeItem: NavigationItem;
@@ -18,6 +19,7 @@ const navigationItems = [
 
 export const Sidebar: React.FC<SidebarProps> = ({ activeItem, onItemClick }) => {
   const { theme, setTheme } = useTheme();
+  const { logout, user } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
   
   const toggleTheme = () => {
@@ -85,6 +87,24 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeItem, onItemClick }) => 
                 {theme.charAt(0).toUpperCase() + theme.slice(1)}
               </span>
             )}
+          </button>
+          
+          {!isCollapsed && user && (
+            <div className="user-info">
+              <div className="user-details">
+                <span className="user-name">{user.name}</span>
+                <span className="user-email">{user.email}</span>
+              </div>
+            </div>
+          )}
+          
+          <button 
+            className="logout-button"
+            onClick={logout}
+            title={isCollapsed ? 'Logout' : 'Sign out'}
+          >
+            <span className="nav-icon">🚪</span>
+            {!isCollapsed && <span className="logout-label">Sign Out</span>}
           </button>
         </div>
       </nav>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TimeEntry, Project, Client } from '../types';
+import { TimeEntry, Project } from '../types';
 import { formatTimeRange } from '../utils/dateUtils';
 import { useCalendarEvents } from '../hooks/useCalendarEvents';
 import { CalendarEvent } from '../services/calendarIntegration';
@@ -7,25 +7,25 @@ import { CalendarEvent } from '../services/calendarIntegration';
 interface WeeklyCalendarProps {
   entries: TimeEntry[];
   projects: Project[];
-  clients: Client[];
   onUpdateEntry: (id: string, updates: Partial<TimeEntry>) => void;
   onDeleteEntry: (id: string) => void;
   onAddEntry?: (entry: Omit<TimeEntry, 'id'>) => void;
 }
 
 const getDayOfWeek = (date: string) => {
-  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  return dayNames[new Date(date).getDay()];
+  const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+  const dayOfWeek = new Date(date).getDay();
+  return dayOfWeek === 0 || dayOfWeek === 6 ? null : dayNames[dayOfWeek - 1];
 };
 
 const getWeekDates = (currentDate: Date) => {
   const week = [];
   const startOfWeek = new Date(currentDate);
   const dayOfWeek = startOfWeek.getDay();
-  const diff = startOfWeek.getDate() - dayOfWeek; // Sunday start (American format)
+  const diff = startOfWeek.getDate() - dayOfWeek + 1; // Monday start
   startOfWeek.setDate(diff);
 
-  for (let i = 0; i < 7; i++) {
+  for (let i = 0; i < 5; i++) {
     const date = new Date(startOfWeek);
     date.setDate(startOfWeek.getDate() + i);
     week.push(date.toISOString().split('T')[0]);
@@ -50,7 +50,6 @@ const formatDate = (dateString: string) => {
 export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
   entries,
   projects,
-  clients,
   onUpdateEntry,
   onDeleteEntry,
   onAddEntry
@@ -242,35 +241,29 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
     // Try to extract client/project from event title
     const title = event.title.toLowerCase();
     
-    // Look for existing clients in the title
-    const matchedClient = clients.find(client => 
-      title.includes(client.name.toLowerCase())
+    // Look for existing projects in the title
+    const matchedProject = projects.find(project => 
+      title.includes(project.name.toLowerCase())
     );
     
-    if (matchedClient) {
-      // Look for existing projects for this client
-      const clientProjects = projects.filter(p => p.client === matchedClient.name);
-      const matchedProject = clientProjects.find(project => 
-        title.includes(project.name.toLowerCase())
-      );
-      
+    if (matchedProject) {
       return {
-        client: matchedClient.name,
-        project: matchedProject?.name || 'General Meeting'
+        client: matchedProject.client,
+        project: matchedProject.name
       };
     }
     
-    // Try to extract from attendees email domains
+    // Try to extract from attendees email domains by matching against project client names
     if (event.attendees && event.attendees.length > 0) {
       for (const attendee of event.attendees) {
         const domain = attendee.split('@')[1];
         if (domain) {
-          const domainClient = clients.find(client => 
-            client.name.toLowerCase().includes(domain.split('.')[0])
+          const domainProject = projects.find(project => 
+            project.client.toLowerCase().includes(domain.split('.')[0])
           );
-          if (domainClient) {
+          if (domainProject) {
             return {
-              client: domainClient.name,
+              client: domainProject.client,
               project: 'General Meeting'
             };
           }
@@ -278,10 +271,11 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
       }
     }
     
-    // Default fallback
+    // Default fallback - use first project if available
+    const defaultProject = projects[0];
     return {
-      client: 'External',
-      project: 'Calendar Meeting'
+      client: defaultProject?.client || 'External',
+      project: defaultProject?.name || 'Calendar Meeting'
     };
   };
 
@@ -529,7 +523,6 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
                 ) : (
                   dayEntries.map(entry => {
                     const project = projects.find(p => p.name === entry.project);
-                    const client = clients.find(c => c.name === entry.client);
                     
                     return (
                       <div key={entry.id} className="time-entry-card">
@@ -546,7 +539,7 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
                           <div className="entry-client">
                             <div 
                               className="client-dot"
-                              style={{ backgroundColor: client?.color || project?.color || '#gray' }}
+                              style={{ backgroundColor: project?.color || '#gray' }}
                             />
                             <span className="client-name">{entry.client}</span>
                           </div>
