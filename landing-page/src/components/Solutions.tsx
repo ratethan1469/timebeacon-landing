@@ -147,34 +147,6 @@ const Solutions: React.FC = () => {
             </div>
           </div>
           
-          {/* Interactive Background Elements */}
-          <div className="solutions-interactive">
-            <div className="animated-chart chart-1">
-              <div className="chart-bar" style={{height: '60%'}}></div>
-              <div className="chart-bar" style={{height: '80%'}}></div>
-              <div className="chart-bar" style={{height: '45%'}}></div>
-              <div className="chart-bar" style={{height: '90%'}}></div>
-            </div>
-            
-            <div className="floating-notification notif-1">
-              <div className="notif-content">
-                <div className="notif-title">New Project Alert</div>
-                <div className="notif-text">Implementation team at 95% capacity</div>
-              </div>
-            </div>
-            
-            <div className="floating-notification notif-2">
-              <div className="notif-content">
-                <div className="notif-title">Revenue Milestone</div>
-                <div className="notif-text">$2.3M additional revenue tracked</div>
-              </div>
-            </div>
-            
-            <div className="progress-circle circle-1">
-              <div className="progress-fill" style={{strokeDasharray: '220 100'}}></div>
-              <div className="progress-text">87%</div>
-            </div>
-          </div>
         </div>
         
         {/* Team Solution Pages Navigation */}
