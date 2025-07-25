@@ -39,7 +39,7 @@ export const Reports: React.FC<ReportsProps> = ({ entries, projects }) => {
   
   const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
   const [selectedChartTypes, setSelectedChartTypes] = useState<('donut' | 'bar' | 'line')[]>(['donut']);
-  const [selectedReportTypes, setSelectedReportTypes] = useState<ReportType[]>(['utilization', 'client-breakdown']);
+  const [selectedReportTypes, setSelectedReportTypes] = useState<ReportType[]>(['utilization', 'project-breakdown']);
   const [savedReports, setSavedReports] = useState<SavedReport[]>([]);
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [reportName, setReportName] = useState('');
@@ -51,9 +51,8 @@ export const Reports: React.FC<ReportsProps> = ({ entries, projects }) => {
     
     const inDateRange = entryDate >= startDate && entryDate <= endDate;
     const inProject = selectedProjects.length === 0 || selectedProjects.includes(entry.project);
-    const inClient = selectedClients.length === 0 || selectedClients.includes(entry.client);
     
-    return inDateRange && inProject && inClient;
+    return inDateRange && inProject;
   });
 
   const formatHours = (hours: number) => {
@@ -708,19 +707,6 @@ export const Reports: React.FC<ReportsProps> = ({ entries, projects }) => {
 
           <div className="form-row">
             <div className="form-group">
-              <label>Clients</label>
-              <MultiSelect
-                options={clients.map(client => ({
-                  value: client.name,
-                  label: client.name
-                }))}
-                selectedValues={selectedClients}
-                onChange={setSelectedClients}
-                placeholder="All clients (or select specific ones)..."
-                className="form-input"
-              />
-            </div>
-            <div className="form-group">
               <label>Projects</label>
               <MultiSelect
                 options={projects.map(project => ({
@@ -881,7 +867,7 @@ export const Reports: React.FC<ReportsProps> = ({ entries, projects }) => {
                 <ul>
                   <li><strong>Report Types:</strong> {selectedReportTypes.map(type => reportTypeOptions.find(opt => opt.value === type)?.label).join(', ')}</li>
                   <li><strong>Date Range:</strong> {new Date(dateRange.start).toLocaleDateString()} - {new Date(dateRange.end).toLocaleDateString()}</li>
-                  <li><strong>Clients:</strong> {selectedClients.length === 0 ? 'All' : selectedClients.join(', ')}</li>
+                  <li><strong>Focus:</strong> Project-based analysis</li>
                   <li><strong>Projects:</strong> {selectedProjects.length === 0 ? 'All' : selectedProjects.join(', ')}</li>
                   <li><strong>Chart Types:</strong> {selectedChartTypes.map(type => chartTypeOptions.find(opt => opt.value === type)?.label).join(', ')}</li>
                 </ul>

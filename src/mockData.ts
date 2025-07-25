@@ -1,5 +1,6 @@
-import { TimeEntry, DashboardStats, Project, Settings, Client, Integration } from './types';
+import { TimeEntry, DashboardStats, Project, Settings, Integration } from './types';
 
+/*
 export const mockClients: Client[] = [
   {
     id: '1',
@@ -144,6 +145,7 @@ export const mockClients: Client[] = [
     createdAt: '2025-01-01'
   }
 ];
+*/
 
 export const mockProjects: Project[] = [
   {
@@ -776,7 +778,6 @@ export const mockTimeEntries: TimeEntry[] = [
 ];
 
 export const mockSettings: Settings = {
-  defaultClients: ['Salesforce', 'HubSpot', 'Zendesk'],
   defaultProjects: ['Enterprise CRM Implementation', 'Marketing Automation Platform', 'Customer Support Portal Migration'],
   workingHours: {
     start: '09:00',
@@ -807,7 +808,6 @@ export const mockDashboardStats: DashboardStats = {
   billableHours: 134.5,
   nonBillableHours: 22.0,
   pendingEntries: 1,
-  totalClients: 5,
   activeProjects: 5,
   totalEarnings: 32375,
   utilizationRate: 85.9,

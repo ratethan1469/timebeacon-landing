@@ -14,33 +14,53 @@ interface DashboardProps {
 
 const getDayOfWeek = (date: string) => {
   const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-  const dayOfWeek = new Date(date).getDay();
-  return dayOfWeek === 0 || dayOfWeek === 6 ? null : dayNames[dayOfWeek - 1];
+  const dateObj = new Date(date);
+  const jsDay = dateObj.getDay(); // 0=Sunday, 1=Monday, etc.
+  
+  // Map JavaScript days to workweek days
+  // JS: Sun=0, Mon=1, Tue=2, Wed=3, Thu=4, Fri=5, Sat=6
+  // We want: Mon=0, Tue=1, Wed=2, Thu=3, Fri=4
+  const workDayMap: { [key: number]: number } = {
+    1: 0, // Monday
+    2: 1, // Tuesday  
+    3: 2, // Wednesday
+    4: 3, // Thursday
+    5: 4  // Friday
+  };
+  
+  const workDay = workDayMap[jsDay];
+  return workDay !== undefined ? dayNames[workDay] : null;
 };
 
 const getWeekDates = (currentDate: Date) => {
   const week = [];
-  const startOfWeek = new Date(currentDate);
-  const dayOfWeek = startOfWeek.getDay();
-  const diff = startOfWeek.getDate() - dayOfWeek + 1; // Monday start
-  startOfWeek.setDate(diff);
-
+  const current = new Date(currentDate);
+  const jsDay = current.getDay();
+  
+  // Calculate days to go back to Monday
+  let daysToMonday;
+  if (jsDay === 0) { // Sunday
+    daysToMonday = 6;
+  } else { // Monday-Saturday
+    daysToMonday = jsDay - 1;
+  }
+  
+  // Get Monday of this week
+  const monday = new Date(current);
+  monday.setDate(current.getDate() - daysToMonday);
+  
+  // Generate Monday through Friday
   for (let i = 0; i < 5; i++) {
-    const date = new Date(startOfWeek);
-    date.setDate(startOfWeek.getDate() + i);
+    const date = new Date(monday);
+    date.setDate(monday.getDate() + i);
     week.push(date.toISOString().split('T')[0]);
   }
+  
   return week;
 };
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
-  const today = new Date().toISOString().split('T')[0];
-  const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-  
-  if (dateString === today) return 'Today';
-  if (dateString === yesterday) return 'Yesterday';
-  
   return date.toLocaleDateString('en-US', { 
     month: 'short', 
     day: 'numeric'
@@ -73,7 +93,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
     date: new Date().toISOString().split('T')[0],
     startTime: '09:00',
     duration: 1,
-    client: '',
     project: '',
     description: '',
     billable: true,
@@ -104,6 +123,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const { getEventsForDate } = useCalendarEvents();
   
   const weekDates = getWeekDates(currentWeek);
+  console.log('WEEK DATES:', weekDates);
+  weekDates.forEach(date => {
+    const dayName = getDayOfWeek(date);
+    console.log(`${date} -> ${dayName}`);
+  });
   
   
   const navigateWeek = (direction: 'prev' | 'next') => {
@@ -152,12 +176,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
         
         <div className="entry-content">
-          <div className="entry-client">
+          <div className="entry-source">
             <div 
-              className="client-dot"
+              className="source-dot"
               style={{ backgroundColor: '#4285F4' }}
             />
-            <span className="client-name">📅 Calendar Event</span>
+            <span className="source-name">📅 Calendar Event</span>
           </div>
           <div className="entry-project">{event.title}</div>
           {event.description && (
@@ -597,7 +621,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   };
 
   const weekStart = new Date(weekDates[0]);
-  const weekEnd = new Date(weekDates[6]);
+  const weekEnd = new Date(weekDates[4]); // Friday is now the last day
   const weekRange = `${weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
 
   return (
@@ -722,18 +746,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
             {entries.filter(e => weekDates.includes(e.date) && e.automated).length}
           </div>
         </div>
-        <div className="summary-card approved-card">
-          <div className="summary-label">✅ Approved Entries</div>
-          <div className="summary-value status-value approved">
-            {entries.filter(e => weekDates.includes(e.date) && e.status === 'approved').length}
-          </div>
-        </div>
-        <div className="summary-card pending-card">
-          <div className="summary-label">⏳ Pending Entries</div>
-          <div className="summary-value status-value pending">
-            {entries.filter(e => weekDates.includes(e.date) && e.status === 'pending').length}
-          </div>
-        </div>
         <div className="submit-actions">
           {isCurrentWeek() ? (
             <div style={{ position: 'relative', display: 'inline-block' }}>
@@ -775,7 +787,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
       </div>
 
       <div className="weekly-grid">
-        {weekDates.map(date => {
+        {weekDates.map((date, index) => {
           const dayEntries = getEntriesForDate(date);
           const dayCalendarEvents = getEventsForDate(date);
           const totalHours = getTotalHoursForDay(date);
@@ -784,11 +796,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
           const isPast = date < new Date().toISOString().split('T')[0];
           const isFuture = date > new Date().toISOString().split('T')[0];
           
+          const dayName = getDayOfWeek(date);
+          if (!dayName) return null; // Skip weekend days
+          
           return (
             <div key={date} className={`day-column ${isToday ? 'today' : ''} ${isPast ? 'past' : ''} ${isFuture ? 'future' : ''}`}>
               <div className="day-header">
                 <div className="day-info">
-                  <div className="day-name">{getDayOfWeek(date)}</div>
+                  <div className="day-name">{dayName}</div>
                   <div className="day-date">{formatDate(date)}</div>
                 </div>
                 <div className="day-total">
@@ -857,14 +872,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
                         </div>
                         
                         <div className="entry-content">
-                          <div className="entry-client">
+                          <div className="entry-project-info">
                             <div 
-                              className="client-dot"
+                              className="project-dot"
                               style={{ backgroundColor: project?.color || '#6366f1' }}
                             />
-                            <span className="client-name">{entry.client}</span>
+                            <span className="project-name">{entry.project}</span>
                           </div>
-                          <div className="entry-project">{entry.project}</div>
                           <div className="entry-description">{entry.description}</div>
                           
                           <div className="entry-meta">

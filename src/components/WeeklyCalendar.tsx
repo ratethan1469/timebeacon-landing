@@ -14,33 +14,51 @@ interface WeeklyCalendarProps {
 
 const getDayOfWeek = (date: string) => {
   const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-  const dayOfWeek = new Date(date).getDay();
-  return dayOfWeek === 0 || dayOfWeek === 6 ? null : dayNames[dayOfWeek - 1];
+  const dateObj = new Date(date + 'T00:00:00'); // Ensure proper date parsing
+  const jsDay = dateObj.getDay();
+  
+  const workDayMap: { [key: number]: number } = {
+    1: 0, // Monday
+    2: 1, // Tuesday  
+    3: 2, // Wednesday
+    4: 3, // Thursday
+    5: 4  // Friday
+  };
+  
+  const workDay = workDayMap[jsDay];
+  return workDay !== undefined ? dayNames[workDay] : null;
 };
 
 const getWeekDates = (currentDate: Date) => {
   const week = [];
-  const startOfWeek = new Date(currentDate);
-  const dayOfWeek = startOfWeek.getDay();
-  const diff = startOfWeek.getDate() - dayOfWeek + 1; // Monday start
-  startOfWeek.setDate(diff);
-
+  const current = new Date(currentDate);
+  current.setHours(0, 0, 0, 0); // Reset time to avoid timezone issues
+  const jsDay = current.getDay();
+  
+  // Calculate days to Monday (0=Sunday, 1=Monday, etc.)
+  let daysToMonday;
+  if (jsDay === 0) { // Sunday
+    daysToMonday = 6;
+  } else {
+    daysToMonday = jsDay - 1;
+  }
+  
+  // Get Monday of the current week
+  const monday = new Date(current);
+  monday.setDate(current.getDate() - daysToMonday);
+  
+  // Generate all 5 weekdays (Monday through Friday)
   for (let i = 0; i < 5; i++) {
-    const date = new Date(startOfWeek);
-    date.setDate(startOfWeek.getDate() + i);
+    const date = new Date(monday);
+    date.setDate(monday.getDate() + i);
     week.push(date.toISOString().split('T')[0]);
   }
+  
   return week;
 };
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
-  const today = new Date().toISOString().split('T')[0];
-  const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-  
-  if (dateString === today) return 'Today';
-  if (dateString === yesterday) return 'Yesterday';
-  
   return date.toLocaleDateString('en-US', { 
     month: 'short', 
     day: 'numeric'
@@ -328,7 +346,7 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
   };
 
   const weekStart = new Date(weekDates[0]);
-  const weekEnd = new Date(weekDates[6]);
+  const weekEnd = new Date(weekDates[4]); // Friday is now the last day
   const weekRange = `${weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
 
   return (
@@ -483,6 +501,9 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
           
           const isPast = date < new Date().toISOString().split('T')[0];
           const isFuture = date > new Date().toISOString().split('T')[0];
+          
+          const dayName = getDayOfWeek(date);
+          if (!dayName) return null; // Skip weekend days
           
           return (
             <div key={date} className={`day-column ${isToday ? 'today' : ''} ${isPast ? 'past' : ''} ${isFuture ? 'future' : ''}`}>

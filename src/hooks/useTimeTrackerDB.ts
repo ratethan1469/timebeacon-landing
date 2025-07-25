@@ -4,14 +4,13 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { TimeEntry, Project, Client, UserSettings } from '../types';
+import { TimeEntry, Project, UserSettings } from '../types';
 import { timeBeaconDB } from '../services/database';
-import { mockTimeEntries, mockProjects, mockClients, mockSettings } from '../mockData';
+import { mockTimeEntries, mockProjects, mockSettings } from '../mockData';
 
 interface TimeTrackerState {
   timeEntries: TimeEntry[];
   projects: Project[];
-  clients: Client[];
   settings: UserSettings;
   isLoading: boolean;
   error: string | null;
@@ -117,9 +116,7 @@ export const useTimeTrackerDB = () => {
     console.log('🚀 Creating initial data with mock entries...');
     
     // Use comprehensive mock data instead of minimal seed data
-    for (const client of mockClients) {
-      await timeBeaconDB.addClient(client);
-    }
+    // Client initialization removed
     
     for (const project of mockProjects) {
       await timeBeaconDB.addProject(project);
@@ -162,7 +159,7 @@ export const useTimeTrackerDB = () => {
     
     await timeBeaconDB.updateSettings(convertedSettings);
     
-    console.log('✅ Initial data created with', mockTimeEntries.length, 'time entries,', mockProjects.length, 'projects, and', mockClients.length, 'clients');
+    console.log('✅ Initial data created with', mockTimeEntries.length, 'time entries and', mockProjects.length, 'projects');
   };
 
   // Time Entry Operations

@@ -1434,7 +1434,7 @@ input:checked + .toggle-slider:before {
 
 .weekly-grid {
   display: grid;
-  grid-template-columns: repeat(7, 280px);
+  grid-template-columns: repeat(5, 280px);
   gap: 1px;
   background: var(--border);
   border-radius: 12px;
@@ -1725,13 +1725,13 @@ input:checked + .toggle-slider:before {
 /* Keep calendar columns consistent across all screen sizes */
 @media (max-width: 1200px) {
   .weekly-grid {
-    grid-template-columns: repeat(7, 280px);
+    grid-template-columns: repeat(5, 280px);
   }
 }
 
 @media (max-width: 768px) {
   .weekly-grid {
-    grid-template-columns: repeat(7, 280px);
+    grid-template-columns: repeat(5, 280px);
   }
   
   .week-navigation {
