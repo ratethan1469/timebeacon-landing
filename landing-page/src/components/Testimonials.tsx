@@ -16,7 +16,7 @@ const Testimonials: React.FC = () => {
         <div className="testimonials-grid">
           <div className="testimonial-card featured">
             <div className="testimonial-content">
-              <div className="stars">★★★★★</div>
+              <div className="stars">5.0 out of 5 stars</div>
               <blockquote>
                 "TimeBeacon transformed our professional services team. We went from 65% to 89% utilization 
                 in just 3 months. The AI automation is incredible - it captures every billable minute without 
@@ -45,7 +45,7 @@ const Testimonials: React.FC = () => {
           
           <div className="testimonial-card">
             <div className="testimonial-content">
-              <div className="stars">★★★★★</div>
+              <div className="stars">5.0 out of 5 stars</div>
               <blockquote>
                 "Finally, a time tracking solution that doesn't feel like a burden. Our Customer Success team 
                 loves how it automatically categorizes client interactions and provides actionable insights 
@@ -64,7 +64,7 @@ const Testimonials: React.FC = () => {
           
           <div className="testimonial-card">
             <div className="testimonial-content">
-              <div className="stars">★★★★★</div>
+              <div className="stars">5.0 out of 5 stars</div>
               <blockquote>
                 "The implementation insights alone have saved us hundreds of hours. We can now predict 
                 project risks early and allocate resources more effectively. Our client satisfaction 
@@ -83,7 +83,7 @@ const Testimonials: React.FC = () => {
           
           <div className="testimonial-card">
             <div className="testimonial-content">
-              <div className="stars">★★★★★</div>
+              <div className="stars">5.0 out of 5 stars</div>
               <blockquote>
                 "TimeBeacon's executive dashboard gives me real-time visibility into our entire 
                 professional services organization. I can make data-driven decisions about capacity, 
@@ -102,7 +102,7 @@ const Testimonials: React.FC = () => {
           
           <div className="testimonial-card">
             <div className="testimonial-content">
-              <div className="stars">★★★★★</div>
+              <div className="stars">5.0 out of 5 stars</div>
               <blockquote>
                 "The ROI was immediate. Within the first month, we recovered the cost of TimeBeacon 
                 just from the additional billable hours we captured. The team adoption was seamless 
@@ -121,7 +121,7 @@ const Testimonials: React.FC = () => {
           
           <div className="testimonial-card">
             <div className="testimonial-content">
-              <div className="stars">★★★★★</div>
+              <div className="stars">5.0 out of 5 stars</div>
               <blockquote>
                 "Security was our biggest concern, but TimeBeacon exceeded all our enterprise requirements. 
                 SOC 2 compliance, SSO integration, and granular permissions gave us complete peace of mind 

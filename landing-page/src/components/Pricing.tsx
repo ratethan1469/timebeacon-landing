@@ -142,9 +142,6 @@ const Pricing: React.FC = () => {
         
         <div className="pricing-guarantee">
           <div className="guarantee-content">
-            <div className="guarantee-badge">
-              <span className="badge-icon">🛡️</span>
-            </div>
             <div className="guarantee-text">
               <h4>30-Day Money-Back Guarantee</h4>
               <p>Not satisfied? Get a full refund within 30 days, no questions asked.</p>

@@ -8,7 +8,6 @@ const Footer: React.FC = () => {
           <div className="footer-main">
             <div className="footer-section brand">
               <div className="footer-logo">
-                <span className="logo-icon">⏱️</span>
                 <span className="logo-text">TimeBeacon</span>
               </div>
               <p className="footer-description">
@@ -119,15 +118,12 @@ const Footer: React.FC = () => {
           
           <div className="footer-certifications">
             <div className="cert-badge">
-              <span className="cert-icon">🛡️</span>
               <span className="cert-text">SOC 2 Type II</span>
             </div>
             <div className="cert-badge">
-              <span className="cert-icon">🔒</span>
               <span className="cert-text">GDPR Compliant</span>
             </div>
             <div className="cert-badge">
-              <span className="cert-icon">⭐</span>
               <span className="cert-text">99.8% Uptime</span>
             </div>
           </div>

@@ -6,7 +6,6 @@ const Hero: React.FC = () => {
       <div className="hero-container">
         <div className="hero-content">
           <div className="hero-badge">
-            <span className="badge-icon">🏆</span>
             <span>Trusted by 500+ Professional Services Teams</span>
           </div>
           
@@ -38,10 +37,8 @@ const Hero: React.FC = () => {
           <div className="hero-actions">
             <a href="https://app.timebeacon.io/signup" className="btn-primary-large">
               Start Free 14-Day Trial
-              <span className="btn-icon">→</span>
             </a>
             <button className="btn-secondary-large">
-              <span className="btn-icon">▶️</span>
               Watch 2-Min Demo
             </button>
           </div>
@@ -65,19 +62,15 @@ const Hero: React.FC = () => {
               <div className="preview-content">
                 <div className="preview-sidebar">
                   <div className="sidebar-item active">
-                    <span className="sidebar-icon">📊</span>
                     <span>Dashboard</span>
                   </div>
                   <div className="sidebar-item">
-                    <span className="sidebar-icon">⏱️</span>
                     <span>Time Tracking</span>
                   </div>
                   <div className="sidebar-item">
-                    <span className="sidebar-icon">📈</span>
                     <span>Analytics</span>
                   </div>
                   <div className="sidebar-item">
-                    <span className="sidebar-icon">👥</span>
                     <span>Team</span>
                   </div>
                 </div>
@@ -112,7 +105,6 @@ const Hero: React.FC = () => {
           
           <div className="floating-cards">
             <div className="floating-card automation">
-              <span className="card-icon">🤖</span>
               <div className="card-content">
                 <div className="card-title">Auto-Detected Meeting</div>
                 <div className="card-subtitle">Client Strategy Session</div>
@@ -121,7 +113,6 @@ const Hero: React.FC = () => {
             </div>
             
             <div className="floating-card insight">
-              <span className="card-icon">💡</span>
               <div className="card-content">
                 <div className="card-title">Utilization Alert</div>
                 <div className="card-subtitle">Team capacity at 95%</div>

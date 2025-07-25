@@ -17,9 +17,6 @@ const Features: React.FC = () => {
         
         <div className="features-grid">
           <div className="feature-card primary">
-            <div className="feature-icon">
-              <span className="icon">🤖</span>
-            </div>
             <div className="feature-content">
               <h3 className="feature-title">AI Meeting Detection</h3>
               <p className="feature-description">
@@ -36,9 +33,6 @@ const Features: React.FC = () => {
           </div>
           
           <div className="feature-card">
-            <div className="feature-icon">
-              <span className="icon">📊</span>
-            </div>
             <div className="feature-content">
               <h3 className="feature-title">Real-Time Analytics</h3>
               <p className="feature-description">
@@ -55,9 +49,6 @@ const Features: React.FC = () => {
           </div>
           
           <div className="feature-card">
-            <div className="feature-icon">
-              <span className="icon">🔄</span>
-            </div>
             <div className="feature-content">
               <h3 className="feature-title">Seamless Integrations</h3>
               <p className="feature-description">
@@ -74,9 +65,6 @@ const Features: React.FC = () => {
           </div>
           
           <div className="feature-card">
-            <div className="feature-icon">
-              <span className="icon">🛡️</span>
-            </div>
             <div className="feature-content">
               <h3 className="feature-title">Enterprise Security</h3>
               <p className="feature-description">
@@ -93,9 +81,6 @@ const Features: React.FC = () => {
           </div>
           
           <div className="feature-card">
-            <div className="feature-icon">
-              <span className="icon">⚡</span>
-            </div>
             <div className="feature-content">
               <h3 className="feature-title">Smart Automation</h3>
               <p className="feature-description">
@@ -112,9 +97,6 @@ const Features: React.FC = () => {
           </div>
           
           <div className="feature-card">
-            <div className="feature-icon">
-              <span className="icon">📱</span>
-            </div>
             <div className="feature-content">
               <h3 className="feature-title">Mobile Excellence</h3>
               <p className="feature-description">
@@ -129,6 +111,28 @@ const Features: React.FC = () => {
               </ul>
             </div>
           </div>
+        </div>
+        
+        {/* Interactive Elements */}
+        <div className="features-interactive">
+          <div className="floating-metric metric-1">
+            <div className="metric-number">+40%</div>
+            <div className="metric-label">Billable Hours</div>
+          </div>
+          
+          <div className="floating-metric metric-2">
+            <div className="metric-number">99.2%</div>
+            <div className="metric-label">Accuracy</div>
+          </div>
+          
+          <div className="floating-metric metric-3">
+            <div className="metric-number">10mins</div>
+            <div className="metric-label">Setup Time</div>
+          </div>
+          
+          <div className="pulse-ring ring-1"></div>
+          <div className="pulse-ring ring-2"></div>
+          <div className="pulse-ring ring-3"></div>
         </div>
       </div>
     </section>

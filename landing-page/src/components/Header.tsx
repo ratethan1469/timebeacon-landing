@@ -1,14 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const Header: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    // Check for saved theme preference or default to light mode
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+      setDarkMode(true);
+      document.documentElement.classList.add('dark');
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const newDarkMode = !darkMode;
+    setDarkMode(newDarkMode);
+    
+    if (newDarkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  };
 
   return (
     <header className="header">
       <nav className="navbar">
         <div className="nav-container">
           <div className="nav-logo">
-            <span className="logo-icon">⏱️</span>
             <span className="logo-text">TimeBeacon</span>
           </div>
           
@@ -57,6 +81,13 @@ const Header: React.FC = () => {
           </div>
           
           <div className="nav-actions">
+            <button 
+              className="theme-toggle-btn"
+              onClick={toggleTheme}
+              aria-label="Toggle theme"
+            >
+              {darkMode ? 'Light' : 'Dark'}
+            </button>
             <a href="https://app.timebeacon.io/login" className="btn-secondary">Sign In</a>
             <a href="https://app.timebeacon.io/signup" className="btn-primary">Start Free Trial</a>
           </div>

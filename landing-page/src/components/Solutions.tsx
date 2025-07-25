@@ -14,9 +14,6 @@ const Solutions: React.FC = () => {
         <div className="solutions-grid">
           <div className="solution-card">
             <div className="solution-header">
-              <div className="solution-icon">
-                <span className="icon">💼</span>
-              </div>
               <div className="solution-title">
                 <h3>Professional Services</h3>
                 <p>Maximize billable utilization and project profitability</p>
@@ -47,9 +44,6 @@ const Solutions: React.FC = () => {
           
           <div className="solution-card">
             <div className="solution-header">
-              <div className="solution-icon">
-                <span className="icon">🎯</span>
-              </div>
               <div className="solution-title">
                 <h3>Customer Success</h3>
                 <p>Optimize account management and renewal strategies</p>
@@ -80,9 +74,6 @@ const Solutions: React.FC = () => {
           
           <div className="solution-card">
             <div className="solution-header">
-              <div className="solution-icon">
-                <span className="icon">⚙️</span>
-              </div>
               <div className="solution-title">
                 <h3>Implementation Teams</h3>
                 <p>Streamline onboarding and reduce time-to-value</p>
@@ -113,9 +104,6 @@ const Solutions: React.FC = () => {
           
           <div className="solution-card featured">
             <div className="solution-header">
-              <div className="solution-icon">
-                <span className="icon">👨‍💼</span>
-              </div>
               <div className="solution-title">
                 <h3>Leadership & Operations</h3>
                 <p>Get complete visibility into team performance and capacity</p>
@@ -157,6 +145,62 @@ const Solutions: React.FC = () => {
                 Schedule Demo
               </a>
             </div>
+          </div>
+          
+          {/* Interactive Background Elements */}
+          <div className="solutions-interactive">
+            <div className="animated-chart chart-1">
+              <div className="chart-bar" style={{height: '60%'}}></div>
+              <div className="chart-bar" style={{height: '80%'}}></div>
+              <div className="chart-bar" style={{height: '45%'}}></div>
+              <div className="chart-bar" style={{height: '90%'}}></div>
+            </div>
+            
+            <div className="floating-notification notif-1">
+              <div className="notif-content">
+                <div className="notif-title">New Project Alert</div>
+                <div className="notif-text">Implementation team at 95% capacity</div>
+              </div>
+            </div>
+            
+            <div className="floating-notification notif-2">
+              <div className="notif-content">
+                <div className="notif-title">Revenue Milestone</div>
+                <div className="notif-text">$2.3M additional revenue tracked</div>
+              </div>
+            </div>
+            
+            <div className="progress-circle circle-1">
+              <div className="progress-fill" style={{strokeDasharray: '220 100'}}></div>
+              <div className="progress-text">87%</div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Team Solution Pages Navigation */}
+        <div className="solution-pages-nav">
+          <h3>Explore Solutions by Team</h3>
+          <div className="solution-nav-grid">
+            <a href="/solutions/professional-services" className="solution-nav-card">
+              <h4>Professional Services</h4>
+              <p>Maximize billable utilization and project profitability</p>
+              <span className="nav-arrow">→</span>
+            </a>
+            <a href="/solutions/customer-success" className="solution-nav-card">
+              <h4>Customer Success</h4>
+              <p>Optimize account management and renewal strategies</p>
+              <span className="nav-arrow">→</span>
+            </a>
+            <a href="/solutions/implementations" className="solution-nav-card">
+              <h4>Implementation Teams</h4>
+              <p>Streamline onboarding and reduce time-to-value</p>
+              <span className="nav-arrow">→</span>
+            </a>
+            <a href="/solutions/leadership" className="solution-nav-card">
+              <h4>Leadership & Operations</h4>
+              <p>Get complete visibility into team performance</p>
+              <span className="nav-arrow">→</span>
+            </a>
           </div>
         </div>
       </div>
