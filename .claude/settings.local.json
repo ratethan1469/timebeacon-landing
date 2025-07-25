@@ -29,7 +29,12 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(npm run type-check:*)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Bash(mkdir:*)",
+      "Bash(npm create:*)",
+      "WebFetch(domain:www.gong.io)",
+      "WebFetch(domain:www.pendo.io)",
+      "WebFetch(domain:www.logicgate.com)"
     ],
     "deny": []
   }
