@@ -2,11 +2,11 @@ import React from 'react';
 
 const Hero: React.FC = () => {
   return (
-    <section className="hero">
+    <section className="hero section-bg-primary">
       <div className="hero-container">
         <div className="hero-content">
           <div className="hero-badge">
-            <span>Trusted by 500+ Professional Services Teams</span>
+            <span>Trusted by 500+ Customer-Facing Teams</span>
           </div>
           
           <h1 className="hero-title">
@@ -15,8 +15,9 @@ const Hero: React.FC = () => {
           </h1>
           
           <p className="hero-subtitle">
-            Automatically capture billable hours, optimize resource allocation, and boost team utilization by 35% 
-            with intelligent time tracking that integrates seamlessly into your existing workflow.
+            Set it and forget it. Timebeacon eliminates manual time entry through intelligent automation and seamless integrations, 
+            saving your team 10+ hours per week while capturing every billable minute. Boost team utilization by 35% 
+            with zero effort from your consultants.
           </p>
           
           <div className="hero-stats">
@@ -35,10 +36,10 @@ const Hero: React.FC = () => {
           </div>
           
           <div className="hero-actions">
-            <a href="https://app.timebeacon.io/signup" className="btn-primary-large">
-              Start Free 14-Day Trial
+            <a href="#roi-calculator" className="btn-primary-large">
+              Get My ROI Report
             </a>
-            <button className="btn-secondary-large">
+            <button className="btn-secondary-large" onClick={() => window.open('https://www.loom.com/share/timebeacon-demo', '_blank')}>
               Watch 2-Min Demo
             </button>
           </div>
@@ -57,7 +58,7 @@ const Hero: React.FC = () => {
                   <span className="nav-dot"></span>
                   <span className="nav-dot"></span>
                 </div>
-                <div className="preview-title">TimeBeacon Dashboard</div>
+                <div className="preview-title">Timebeacon Dashboard</div>
               </div>
               <div className="preview-content">
                 <div className="preview-sidebar">
@@ -103,20 +104,44 @@ const Hero: React.FC = () => {
             </div>
           </div>
           
-          <div className="floating-cards">
-            <div className="floating-card automation">
-              <div className="card-content">
-                <div className="card-title">Auto-Detected Meeting</div>
-                <div className="card-subtitle">Client Strategy Session</div>
-                <div className="card-time">2.5 hours • Billable</div>
+          <div className="insight-cards">
+            <div className="insight-card purple-card">
+              <div className="insight-content">
+                <div className="insight-value">Zero</div>
+                <div className="insight-label">Manual Time Entry</div>
+                <div className="insight-desc">Employees keep final approval</div>
               </div>
             </div>
             
-            <div className="floating-card insight">
-              <div className="card-content">
-                <div className="card-title">Utilization Alert</div>
-                <div className="card-subtitle">Team capacity at 95%</div>
-                <div className="card-action">View recommendations</div>
+            <div className="insight-card purple-card">
+              <div className="insight-content">
+                <div className="insight-value">10hrs</div>
+                <div className="insight-label">Saved Per Employee</div>
+                <div className="insight-desc">Per week on admin tasks</div>
+              </div>
+            </div>
+            
+            <div className="insight-card purple-card">
+              <div className="insight-content">
+                <div className="insight-value">More $</div>
+                <div className="insight-label">Customer Focus Time</div>
+                <div className="insight-desc">Increased billable hours</div>
+              </div>
+            </div>
+            
+            <div className="insight-card purple-card">
+              <div className="insight-content">
+                <div className="insight-value">100%</div>
+                <div className="insight-label">Data Ownership</div>
+                <div className="insight-desc">You control all your data</div>
+              </div>
+            </div>
+            
+            <div className="insight-card purple-card">
+              <div className="insight-content">
+                <div className="insight-value">Real-time</div>
+                <div className="insight-label">Manager Insights</div>
+                <div className="insight-desc">AI summaries show what teams actually do</div>
               </div>
             </div>
           </div>

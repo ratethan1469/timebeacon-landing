@@ -6,28 +6,44 @@ const SocialProof: React.FC = () => {
       <div className="container">
         <div className="social-proof-content">
           <p className="social-proof-text">
-            Trusted by leading Professional Services and Customer Success teams at:
+            Trusted by customer-facing teams:
           </p>
-          <div className="customer-logos">
-            <div className="logo-item">
-              <div className="logo-placeholder">Salesforce</div>
-            </div>
-            <div className="logo-item">
-              <div className="logo-placeholder">HubSpot</div>
-            </div>
-            <div className="logo-item">
-              <div className="logo-placeholder">Zendesk</div>
-            </div>
-            <div className="logo-item">
-              <div className="logo-placeholder">Atlassian</div>
-            </div>
-            <div className="logo-item">
-              <div className="logo-placeholder">ServiceNow</div>
-            </div>
-            <div className="logo-item">
-              <div className="logo-placeholder">Workday</div>
+          {/* COMMENTED OUT UNTIL WE HAVE REAL CUSTOMER LOGOS
+          <div className="customer-logos-scroll">
+            <div className="logos-track">
+              <div className="logo-item">
+                <div className="logo-placeholder">Pendo</div>
+              </div>
+              <div className="logo-item">
+                <div className="logo-placeholder">LogicGate</div>
+              </div>
+              <div className="logo-item">
+                <div className="logo-placeholder">Gong</div>
+              </div>
+              <div className="logo-item">
+                <div className="logo-placeholder">Outreach</div>
+              </div>
+              <div className="logo-item">
+                <div className="logo-placeholder">ChurnZero</div>
+              </div>
+              <div className="logo-item">
+                <div className="logo-placeholder">Gainsight</div>
+              </div>
+              <div className="logo-item">
+                <div className="logo-placeholder">Pendo</div>
+              </div>
+              <div className="logo-item">
+                <div className="logo-placeholder">LogicGate</div>
+              </div>
+              <div className="logo-item">
+                <div className="logo-placeholder">Gong</div>
+              </div>
+              <div className="logo-item">
+                <div className="logo-placeholder">Outreach</div>
+              </div>
             </div>
           </div>
+          */}
         </div>
       </div>
     </section>

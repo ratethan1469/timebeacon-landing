@@ -8,10 +8,10 @@ const Footer: React.FC = () => {
           <div className="footer-main">
             <div className="footer-section brand">
               <div className="footer-logo">
-                <span className="logo-text">TimeBeacon</span>
+                <span className="logo-text">Timebeacon</span>
               </div>
               <p className="footer-description">
-                The AI-powered time tracking platform trusted by 500+ professional services teams 
+                The AI-powered time tracking platform trusted by 500+ customer-facing teams 
                 to maximize billable hours and optimize team utilization.
               </p>
               <div className="social-links">
@@ -102,6 +102,34 @@ const Footer: React.FC = () => {
           </div>
         </div>
         
+        <div className="privacy-security-note">
+          <div className="privacy-content">
+            <h4 className="privacy-title">Your Data, Your Control</h4>
+            <p className="privacy-text">
+              <strong>Employee Data Ownership:</strong> Your team retains 100% ownership and control of all time tracking data. 
+              Timebeacon only automates the tedious manual entry process while ensuring employees maintain final approval over their timesheet submissions.
+            </p>
+            <div className="privacy-features">
+              <div className="privacy-feature">
+                <span className="privacy-icon">🔒</span>
+                <span>SOC 2 Type II Certified</span>
+              </div>
+              <div className="privacy-feature">
+                <span className="privacy-icon">✓</span>
+                <span>Employee Final Approval</span>
+              </div>
+              <div className="privacy-feature">
+                <span className="privacy-icon">🛡️</span>
+                <span>Zero Data Selling</span>
+              </div>
+              <div className="privacy-feature">
+                <span className="privacy-icon">📊</span>
+                <span>Complete Data Portability</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
         <div className="footer-bottom">
           <div className="footer-legal">
             <div className="legal-links">
@@ -112,7 +140,7 @@ const Footer: React.FC = () => {
               <a href="/gdpr">GDPR</a>
             </div>
             <div className="copyright">
-              © 2024 TimeBeacon. All rights reserved.
+              © 2024 Timebeacon. All rights reserved.
             </div>
           </div>
           

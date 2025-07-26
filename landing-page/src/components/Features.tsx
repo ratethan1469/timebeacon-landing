@@ -16,12 +16,13 @@ const Features: React.FC = () => {
         </div>
         
         <div className="features-grid">
-          <div className="feature-card primary">
+          <div className="feature-card">
             <div className="feature-content">
               <h3 className="feature-title">AI Meeting Detection</h3>
               <p className="feature-description">
-                Automatically captures and categorizes meetings from your calendar, 
-                Zoom, Teams, and Slack with 99.2% accuracy. No manual entry required.
+                Set it and forget it. Once you choose integrations, you're good. 
+                Automatically captures and categorizes meetings from Google Calendar, Outlook, 
+                Zoom, Teams, and Slack with 99.2% accuracy.
               </p>
               <ul className="feature-list">
                 <li>Real-time calendar integration</li>
@@ -36,14 +37,14 @@ const Features: React.FC = () => {
             <div className="feature-content">
               <h3 className="feature-title">Real-Time Analytics</h3>
               <p className="feature-description">
-                Get instant insights into team utilization, project profitability, 
-                and resource allocation with customizable dashboards.
+                Finally see what your team actually does. AI-powered summaries give managers 
+                detailed insights into team activities, project progress, and resource allocation.
               </p>
               <ul className="feature-list">
+                <li>AI work summaries for managers</li>
                 <li>Live utilization tracking</li>
                 <li>Revenue forecasting</li>
                 <li>Capacity planning alerts</li>
-                <li>Custom reporting suite</li>
               </ul>
             </div>
           </div>

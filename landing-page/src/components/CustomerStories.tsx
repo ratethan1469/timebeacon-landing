@@ -7,14 +7,15 @@ const CustomerStories: React.FC = () => {
         <div className="customer-stories-header">
           <h2 className="customer-stories-title">Transforming Professional Services Worldwide</h2>
           <p className="customer-stories-subtitle">
-            TimeBeacon's AI-powered time tracking platform is trusted by professional services teams across 
-            45+ countries to maximize billable hours and optimize team utilization. By providing teams with 
-            automatic time capture, intelligent project categorization, and real-time insights, TimeBeacon 
-            enables businesses worldwide to deliver exceptional client services—driving revenue growth, 
-            reducing administrative overhead, and improving team productivity on a global scale.
+            Timebeacon's AI-powered time tracking platform helps professional services teams 
+            maximize billable hours and optimize team utilization. By providing teams with 
+            automatic time capture, intelligent project categorization, and real-time insights, Timebeacon 
+            enables businesses to deliver exceptional client services—driving revenue growth, 
+            reducing administrative overhead, and improving team productivity.
           </p>
         </div>
         
+        {/* COMMENTED OUT UNTIL WE HAVE REAL CUSTOMER STORIES
         <div className="customer-stories-grid">
           <div className="customer-story-card">
             <div className="customer-logo">
@@ -94,6 +95,7 @@ const CustomerStories: React.FC = () => {
             </div>
           </div>
         </div>
+        */}
         
         <div className="customer-stories-cta">
           <a href="/customers" className="explore-stories-link">

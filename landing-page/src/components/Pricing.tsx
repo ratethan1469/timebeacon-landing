@@ -34,10 +34,10 @@ const Pricing: React.FC = () => {
               <p className="plan-description">Perfect for small teams getting started</p>
               <div className="plan-price">
                 <span className="currency">$</span>
-                <span className="amount">{isAnnual ? '19' : '24'}</span>
+                <span className="amount">{isAnnual ? '10' : '12'}</span>
                 <span className="period">per user/month</span>
               </div>
-              {isAnnual && <div className="savings">Save $60 per user annually</div>}
+              {isAnnual && <div className="savings">Save $24 per user annually</div>}
             </div>
             
             <div className="card-content">
@@ -64,10 +64,10 @@ const Pricing: React.FC = () => {
               <p className="plan-description">For growing professional services teams</p>
               <div className="plan-price">
                 <span className="currency">$</span>
-                <span className="amount">{isAnnual ? '39' : '49'}</span>
+                <span className="amount">{isAnnual ? '20' : '25'}</span>
                 <span className="period">per user/month</span>
               </div>
-              {isAnnual && <div className="savings">Save $120 per user annually</div>}
+              {isAnnual && <div className="savings">Save $60 per user annually</div>}
             </div>
             
             <div className="card-content">

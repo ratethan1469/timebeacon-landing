@@ -143,7 +143,7 @@ const ProfessionalServicesPage: React.FC = () => {
         <div className="container">
           <div className="testimonial-content">
             <blockquote>
-              "TimeBeacon transformed our professional services practice. We went from 65% to 89% 
+              "Timebeacon transformed our professional services practice. We went from 65% to 89% 
               utilization in just 3 months. The AI automation is incredible - it captures every 
               billable minute without any manual work from our consultants."
             </blockquote>
