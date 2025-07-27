@@ -11,15 +11,17 @@ const About: React.FC = () => {
           </div>
           
           <h1 className="hero-title">
-            We're Building the Future of
-            <span className="gradient-text"> Work Intelligence</span>
+            Hey, I'm <span className="gradient-text">Ethan!</span>
           </h1>
           
           <p className="hero-subtitle">
-            Founded by Ethan Ratnowsky, who experienced the pain of manual time tracking firsthand across 5+ years 
-            at Series B, C, and D B2B SaaS companies, Timebeacon is on a mission to eliminate timesheet submission 
-            delays and give teams back their most valuable resource: time. No more late submissions, no more manager 
-            follow-ups, no more lost revenue.
+            I've spent the last 5+ years in the B2B SaaS world, working as an Implementation Manager and Professional Services Consultant.
+            <br><br>
+            I've been deep in the trenches with customer-facing teams. I've seen the pain. I know the pain. Time tracking is manual. It's gruesome. It's inefficient. And honestly? It's way too easy to forget.
+            <br><br>
+            That's why I started Timebeacon — a lightweight tool that automatically tracks time across tools like Zoom, Gong, Slack, and Google Calendar. No timers, no spreadsheets. Just clarity on where your time is going so you can focus on the work that actually matters.
+            <br><br>
+            I'm based in NYC. I like language learning, making dinner from scratch, and building things that solve real problems.
           </p>
           
           <div className="hero-stats">
