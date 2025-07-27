@@ -34,7 +34,16 @@
       "Bash(npm create:*)",
       "WebFetch(domain:www.gong.io)",
       "WebFetch(domain:www.pendo.io)",
-      "WebFetch(domain:www.logicgate.com)"
+      "WebFetch(domain:www.logicgate.com)",
+      "Bash(find:*)",
+      "Bash(git checkout:*)",
+      "Bash(for file in /Users/miriamritter/Desktop/timebeacon-app/landing-page/src/pages/*.tsx)",
+      "Bash(do)",
+      "Bash(done)",
+      "Bash(git clone:*)",
+      "Bash(cp:*)",
+      "Bash(git remote set-url:*)",
+      "Bash(npm run preview:*)"
     ],
     "deny": []
   }
