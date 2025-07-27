@@ -16,11 +16,11 @@ const About: React.FC = () => {
           
           <p className="hero-subtitle">
             I've spent the last 5+ years in the B2B SaaS world, working as an Implementation Manager and Professional Services Consultant.
-            <br><br>
+            <br /><br />
             I've been deep in the trenches with customer-facing teams. I've seen the pain. I know the pain. Time tracking is manual. It's gruesome. It's inefficient. And honestly? It's way too easy to forget.
-            <br><br>
+            <br /><br />
             That's why I started Timebeacon — a lightweight tool that automatically tracks time across tools like Zoom, Gong, Slack, and Google Calendar. No timers, no spreadsheets. Just clarity on where your time is going so you can focus on the work that actually matters.
-            <br><br>
+            <br /><br />
             I'm based in NYC. I like language learning, making dinner from scratch, and building things that solve real problems.
           </p>
           
