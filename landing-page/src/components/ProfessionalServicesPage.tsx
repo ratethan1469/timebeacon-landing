@@ -163,7 +163,7 @@ const ProfessionalServicesPage: React.FC = () => {
         <div className="container">
           <div className="cta-content">
             <h2>Ready to Maximize Your Team's Billable Hours?</h2>
-            <p>Join 200+ professional services teams who've increased their utilization by 40%</p>
+            <p style={{color: 'black'}}>Join 200+ professional services teams who've increased their utilization by 40%</p>
             <div className="cta-actions">
               <a href="https://app.timebeacon.io/signup" className="btn-primary-large">
                 Start Free 14-Day Trial

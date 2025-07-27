@@ -234,8 +234,8 @@ const ProfessionalServices: React.FC = () => {
       {/* ROI Section */}
       <section className="pricing">
         <div className="container">
-          <h2 className="section-title">
-            Professional Services <span className="gradient-text">ROI Calculator</span>
+          <h2 className="section-title" style={{color: 'black'}}>
+            Professional Services <span style={{color: 'black'}}>ROI Calculator</span>
           </h2>
           
           <div className="roi-example">
