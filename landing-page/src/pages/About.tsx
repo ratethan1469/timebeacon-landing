@@ -278,41 +278,6 @@ const About: React.FC = () => {
         </div>
       </section>
 
-      {/* Investors Section */}
-      <section className="about-investors">
-        <div className="container">
-          <h2 className="section-title">
-            Backed by <span className="gradient-text">Leading Investors</span>
-          </h2>
-          
-          <p className="investors-subtitle">
-            We're proud to be supported by world-class investors who share our vision 
-            of eliminating manual time tracking forever.
-          </p>
-          
-          <div className="investors-grid">
-            <div className="investor-card">
-              <div className="investor-logo">Sequoia Capital</div>
-              <p>Leading our Series A to scale AI-powered time tracking globally</p>
-            </div>
-            
-            <div className="investor-card">
-              <div className="investor-logo">Andreessen Horowitz</div>
-              <p>Supporting our mission to automate knowledge work</p>
-            </div>
-            
-            <div className="investor-card">
-              <div className="investor-logo">Y Combinator</div>
-              <p>Where we first validated the massive demand for automated time tracking</p>
-            </div>
-            
-            <div className="investor-card">
-              <div className="investor-logo">FirstRound Capital</div>
-              <p>Helping us build the category-defining time intelligence platform</p>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* CTA Section */}
       <section className="roi-calculator">
