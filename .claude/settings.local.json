@@ -43,7 +43,9 @@
       "Bash(git clone:*)",
       "Bash(cp:*)",
       "Bash(git remote set-url:*)",
-      "Bash(npm run preview:*)"
+      "Bash(npm run preview:*)",
+      "Bash(git pull:*)",
+      "Bash(git rebase:*)"
     ],
     "deny": []
   }
