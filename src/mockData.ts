@@ -377,6 +377,30 @@ export const mockIntegrations: Integration[] = [
       syncOpportunities: true,
       autoCreateProjects: true
     }
+  },
+  {
+    id: '6',
+    name: 'gmail',
+    enabled: false,
+    settings: {}
+  },
+  {
+    id: '7',
+    name: 'google-docs',
+    enabled: false,
+    settings: {}
+  },
+  {
+    id: '8',
+    name: 'google-sheets',
+    enabled: false,
+    settings: {}
+  },
+  {
+    id: '9',
+    name: 'google-slides',
+    enabled: false,
+    settings: {}
   }
 ];
 

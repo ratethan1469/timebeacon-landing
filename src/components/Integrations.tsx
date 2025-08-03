@@ -1,6 +1,7 @@
 import React from 'react';
 import { Integration } from '../types';
 import { GoogleCalendarAuth } from './GoogleCalendarAuth';
+import { Icon } from './Icon';
 
 interface IntegrationsProps {
   integrations: Integration[];
@@ -11,51 +12,72 @@ const integrationDetails = {
   'google-calendar': {
     name: 'Google Calendar',
     description: 'Automatically create time entries from calendar meetings',
-    icon: '📅',
+    icon: 'calendar',
     color: '#4285F4',
     category: 'Calendar & Scheduling'
   },
   'slack': {
     name: 'Slack',
     description: 'Track time spent in client channels and DMs',
-    icon: '💬',
+    icon: 'message-circle',
     color: '#4A154B',
     category: 'Communication'
   },
   'zoom': {
     name: 'Zoom',
     description: 'Auto-track meeting duration and participants',
-    icon: '📹',
+    icon: 'video',
     color: '#2D8CFF',
     category: 'Video Conferencing'
   },
   'teams': {
     name: 'Microsoft Teams',
     description: 'Track meetings and collaboration time',
-    icon: '👥',
+    icon: 'users',
     color: '#6264A7',
     category: 'Video Conferencing'
   },
   'gmail': {
     name: 'Gmail',
     description: 'Track time spent on client email threads',
-    icon: '📧',
+    icon: 'mail',
     color: '#EA4335',
     category: 'Communication'
   },
   'jira': {
     name: 'Jira',
     description: 'Auto-create entries from ticket work',
-    icon: '🎯',
+    icon: 'target',
     color: '#0052CC',
     category: 'Project Management'
   },
   'salesforce': {
     name: 'Salesforce',
     description: 'Track customer interactions and opportunities',
-    icon: '☁️',
+    icon: 'cloud',
     color: '#00A1E0',
     category: 'CRM & Sales'
+  },
+  'google-docs': {
+    name: 'Google Docs',
+    description: 'Track time spent writing and editing documents',
+    icon: 'file-text',
+    color: '#4285F4',
+    category: 'Productivity'
+  },
+  'google-sheets': {
+    name: 'Google Sheets',
+    description: 'Track time spent on spreadsheet analysis and data work',
+    icon: 'table',
+    color: '#34A853',
+    category: 'Productivity'
+  },
+  'google-slides': {
+    name: 'Google Slides',
+    description: 'Track time spent creating and editing presentations',
+    icon: 'presentation',
+    color: '#FF6D01',
+    category: 'Productivity'
   }
 };
 
@@ -102,12 +124,12 @@ export const Integrations: React.FC<IntegrationsProps> = ({
                   <div className="integration-header">
                     <div className="integration-info">
                       <div className="integration-icon-name">
-                        <span 
+                        <div 
                           className="integration-icon"
                           style={{ color: details.color }}
                         >
-                          {details.icon}
-                        </span>
+                          <Icon name={details.icon} size={24} color={details.color} />
+                        </div>
                         <div>
                           <h3 className="integration-name">{details.name}</h3>
                           <p className="integration-description">{details.description}</p>
@@ -208,21 +230,27 @@ export const Integrations: React.FC<IntegrationsProps> = ({
         <div style={{ padding: '24px' }}>
           <div className="info-grid">
             <div className="info-item">
-              <span className="info-icon">🤖</span>
+              <div className="info-icon">
+                <Icon name="target" size={24} color="var(--brand-primary)" />
+              </div>
               <div>
                 <h3>Automatic Detection</h3>
                 <p>TimeBeacon monitors your connected tools and automatically detects billable activities.</p>
               </div>
             </div>
             <div className="info-item">
-              <span className="info-icon">✏️</span>
+              <div className="info-icon">
+                <Icon name="file-text" size={24} color="var(--brand-primary)" />
+              </div>
               <div>
                 <h3>Review & Edit</h3>
                 <p>All automatically created entries can be reviewed, edited, or deleted before submission.</p>
               </div>
             </div>
             <div className="info-item">
-              <span className="info-icon">📊</span>
+              <div className="info-icon">
+                <Icon name="table" size={24} color="var(--brand-primary)" />
+              </div>
               <div>
                 <h3>Intelligent Categorization</h3>
                 <p>We automatically categorize time entries based on context and participants.</p>
